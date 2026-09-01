@@ -225,8 +225,26 @@ status-website:
        the bottom of short pages instead of leaving it floating mid-screen. */
     #sapper { display: flex; flex-direction: column; min-height: 100vh; }
     .pb-navbar { order: 0; }
-    main       { order: 1; flex: 1 0 auto; padding: 0 20px 48px; }
     .pb-footer { order: 2; }
+
+    /* WIDTH. Upptime caps content at 800px; the site's own standing pages
+       (stubs.css) use 1100px, so this matches /help/ rather than Upptime.
+       `width: 100%` is load-bearing and not redundant: <main> carries
+       `margin: 0 auto`, and an auto cross-axis margin DISABLES flex stretch, so
+       inside the flex column above it collapsed to its content width - 379px in
+       a 1440px viewport - and centred itself. It read as a styling choice rather
+       than a bug, which is why it needed measuring rather than looking at.
+       Addressed via #sapper > main so it beats Upptime's `.container` on
+       specificity without !important. */
+    #sapper > main {
+      order: 1;
+      flex: 1 0 auto;
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      padding: 0 20px 48px;
+    }
     h1, h2, h3, h4 { font-family: var(--pb-font-sans); font-weight: 700; }
     main a { color: var(--efg-verdun-green); }
 
@@ -299,11 +317,11 @@ status-website:
     @media (min-width: 768px) {
       .pb-logo-sub { display: block; }
       .pb-footer__inner { padding: 14px 32px; flex-direction: row; justify-content: space-between; align-items: center; gap: 32px; }
-      main { padding: 0 32px 48px; }
+      #sapper > main { padding: 0 32px 48px; }
     }
     @media (min-width: 1024px) {
       .pb-footer__inner { padding: 14px 48px; }
-      main { padding: 0 48px 48px; }
+      #sapper > main { padding: 0 48px 48px; }
     }
 
   navbar:
