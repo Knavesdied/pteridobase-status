@@ -18,6 +18,29 @@
 owner: Knavesdied
 repo: pteridobase-status
 
+# ROOT-LEVEL keys, not under `status-website` - Graph.svelte reads them straight
+# off the config root (`import config from "../data/config.json"`), so nesting
+# them would silently do nothing.
+#
+# These colour the Chart.js graph on the /history/ pages. They do NOT touch the
+# sparkline behind each card on the front page: that is a generated PNG from the
+# separate @upptime/graphs package, recoloured in CSS instead. Two different
+# charts, two different mechanisms - fixing one leaves the other stock teal,
+# which is exactly what happened.
+#
+# Verdun Green for the line; the fill is the same light tint the card sparklines
+# resolve to (#c0d59b), so both charts read as one palette.
+graphBorderColor: "#336600"
+graphBackgroundColor: "#c0d59b"
+
+# en-GB, so dates read 01/09/2026 rather than 9/1/2026. The platform is a UK
+# charity's, and a day/month ambiguity on an incident timeline is the kind of
+# thing that gets misread precisely when it matters. Set explicitly because
+# Upptime supplies its own default when this is absent - which is why the UTC
+# override's own `en-GB` fallback never applied: the locale was never undefined.
+i18n:
+  locale: en-GB
+
 sites:
   - name: Pteridobase
     url: https://pteridobase.org/
