@@ -79,6 +79,13 @@ status-website:
   name: Pteridobase Status
   theme: light
 
+  # Build-time only: the generator DOWNLOADS this and emits /logo-192.png and
+  # /logo-512.png, which it then links as icons AFTER our own <link>, so the last
+  # one wins. Pointing it at the Pteridobase site icon is what makes the browser
+  # tab match pteridobase.org. Visitors never fetch this URL - the CI runner does,
+  # once, at build time - so it is not a runtime dependency on another host.
+  logoUrl: https://raw.githubusercontent.com/Knavesdied/pteridobase-status/main/assets/site-icon-192x192.png
+
   # BRANDING. Upptime's status page is a static Svelte site we control through
   # these keys, so matching pteridobase.org is configuration rather than a fork.
   #
@@ -112,6 +119,17 @@ status-website:
     <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAEpklEQVRYhe3XXWxTZRzH8W97Ttt1fV/Xdm3ZVvbSrt06xroNQQYMRiwGRCLohXil1yYmRu+IdxqiV8QrE73AC8VEMxNAQwKMQOJ4meFlAycbYzDW0W7d2rXbTl+OFyQ1yMABNYvG5+rk9895/p/8T56TPIpQm1FmBZdyJZv/D/hHAF1du1AoFCsHeGXXfvwNLSsHkOU8raGNxQG8tf9dSkv1j62Hw6+jUqkfykSVmrGxm8UBeH1B9r729pI1rVZHR8dmamv8D+Xx6Si5XK44gJ6ew+zd+86SU9BqdRj0ZnwNzYXM4/HidFahLSktDuDy5V8wGEyEX9r3SK2uLkBpqQ5QoFQ+2KauNoDN5mRVZU1xAJmMRH//OQKBtY/UrFY7+XyeLVt2UlZmA0Cl1pBKJbDbXQXUcwEABgYv4fF40emMhcxotLCuowtZztPXd5LFxUXgwT8AFJRoShAEsTgAf0MLq1atZsP6bQ/ll6/0IUkSPm8zG9Z3A3Du7M8YDCYqK2uxmMuLAzj+03ckk7MoBaGQ1dc30tQYwmarYGjoKkO/XwVAyiySy2VRCgL19Y3FAchynvn5NGaztZAJgshsIs78Qhq93ogkLRZyQRBRqzRYyysQRdXzA9xuD+l0krZQJ1qtDoCZmSni8SkykkQg0IrTWQnAyMgNxsaGiUzeJZ1OYjKVFfYJBtuXD3C5qgvPkchd9HojJlMZPt+DM59IzNAcbEevN3K69yharR6DwUw4vI/W1hcxGS0YDRaSyVkAOjeGqatb+pMsCejsDBeOViwa4c7dW9hsTrZ378FgMFNb60ejKUGt1uDzBtGWaPH5gsSiEe7fH2d0dAibzcnalvWoVGpCoY3cnxxfEiC4XJqP/hqWaLR8+MFnnDz5I9PTUaKxCLU1fqxWO4IostrjA2SMRgu5fI75+RT5XJ7t2/dQWVWHXm/gyJEvuHjpDJs37WBNywv0njlGPB5b3gSisQjz8ykOHPic1TU+nBWVJBJxGhpaWNO8jsHrv5LNZlmUFii3OnA5q2lr68Ra7iAycYfkXIJNm1+murqenTvfJBaNMDU1ufwJzM5OY7ZY8TesZdvW3ajUGu7du43X24TD4aapqZ1kMo7BYEYURVLpORobQ5hNVq4NXEShUKLVlrIj/AYjIzc4euwbxsdHlw8AiEYjBIPtuFzVqFVq7HY32ayETmdgYmKMWCzCwkKaXC7Ptq27MRktzM0lqK6qY+LeGC5XFWqVmuPHv+XChd4lmz8RIEkLzKWSWK12pIzEmuYORm/fpKqyFrfbQyDQilqtoampDVnOMzsbRykIJBJxpqYmmZwc5+NP3uPK1fOPbQ7w2B92JiNx/vwpRoav0939KtLiAg6Hm2RyBqu1AlnO43JVo1AoyGYzKJVKbt36jVQ6yeGvDzEwcOmJjf92AgCyLJNKJRkZuUE0NsHgYD9+fyvl5Q4ik+N8+dWniCoVbpeH071H6ek5TF/fKa5du7is5gCKp7kZiaKKQ4e+Z3R0iIMH30eWZXy+Zrq6dnHixA8MDw8uu/EzAQAaAyEGr/cjy3++JggiuVz2qZs/E6DY6793M/rXAf4AR7+aNjJ2FmkAAAAASUVORK5CYII=" />
     <meta name="theme-color" content="#33340e" />
 
+  # THE HEADER AND THE FOOTER ARE BOTH HERE, and the footer's placement is the
+  # reason. `customFootHtml` exists in @upptime/status-page's current source but
+  # is NOT emitted by the version uptime-monitor v1.43.16 pins - verified by
+  # grepping the served HTML, where the only `pb-footer` string was the one in
+  # our own CSS. A key that silently does nothing is worse than no key, so it is
+  # removed rather than left looking configured.
+  #
+  # Both blocks are therefore injected at the TOP of #sapper, and CSS `order`
+  # puts the footer last (see the flex rules below). Ordering in CSS rather than
+  # in the DOM also means this keeps working if the injection point moves.
+  #
   # The site header. Deliberately WITHOUT the hamburger toggle that
   # site-header.php carries: that exists because the real nav has five or more
   # links, and with two they fit at every width. A non-functioning toggle would
@@ -131,14 +149,6 @@ status-website:
       </nav>
     </header>
 
-  # The site footer, with the Upptime credit added as a final small-print
-  # segment so it inherits the same separator treatment as the rest of the row.
-  #
-  # NO YEAR IN THE COPYRIGHT, deliberately, and for the same reason
-  # theme/pteridobase/parts/footer.html omits one: this is static content that
-  # cannot call gmdate(), so a hardcoded year is simply a stale one waiting to
-  # happen. A copyright notice does not require a year to be valid.
-  customFootHtml: |
     <footer class="pb-footer" role="contentinfo">
       <div class="pb-footer__inner">
         <div class="pb-footer__brand">
@@ -196,7 +206,13 @@ status-website:
       background: #ffffff;
       margin: 0;
     }
-    main { padding: 0 20px 48px; }
+    /* Both injected blocks arrive at the top of #sapper, so ORDER - not DOM
+       position - puts the footer last. flex:1 on main also pins the footer to
+       the bottom of short pages instead of leaving it floating mid-screen. */
+    #sapper { display: flex; flex-direction: column; min-height: 100vh; }
+    .pb-navbar { order: 0; }
+    main       { order: 1; flex: 1 0 auto; padding: 0 20px 48px; }
+    .pb-footer { order: 2; }
     h1, h2, h3, h4 { font-family: var(--pb-font-sans); font-weight: 700; }
     main a { color: var(--efg-verdun-green); }
 
