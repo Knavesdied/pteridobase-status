@@ -200,8 +200,20 @@ status-website:
 
     /* Upptime ships its own bare <nav> and <footer>. Ours replace them.
        Matched with :not() rather than a child selector so this keeps working if
-       the generator changes where they sit in the tree. */
-    nav:not(.pb-nav-links), footer:not(.pb-footer) { display: none !important; }
+       the generator changes where they sit in the tree.
+       BOTH of our navs must be excluded. The footer's link list is also a <nav>,
+       so the first version of this rule - which only spared .pb-nav-links - hid
+       the entire footer navigation. Every DOM check still passed, because the
+       six links existed and carried the right text; they were simply zero-sized.
+       Only a screenshot showed it. */
+    nav:not(.pb-nav-links):not(.pb-footer__nav),
+    footer:not(.pb-footer) { display: none !important; }
+
+    /* Upptime styles the bare `nav` element with a white background, which both
+       of ours inherited - painting a white block over the Camouflage navbar and
+       the green footer. Reset it explicitly rather than relying on our own rules
+       to happen to override a selector we do not control. */
+    .pb-nav-links, .pb-footer__nav { background: transparent; }
 
     body {
       font-family: var(--pb-font-serif);
