@@ -330,8 +330,22 @@ status-website:
 
     /* ---- Footer ----------------------------------------------------------- */
     .pb-footer { background: var(--efg-verdun-green); color: #fff; }
+    /* MOBILE STACK ORDER: `column`, NOT the site's `column-reverse`.
+       The site reverses so its SIX footer links sit above the brand block; with
+       one link that reads as a stray "Credits" floating above the organisation
+       it belongs to. The reversal earns its keep there and not here, so this is
+       a deliberate divergence from /help/ rather than an oversight.
+
+       BOTTOM PADDING clears iOS Safari's floating toolbar, which overlays the
+       page and was cutting the charity line in half. env(safe-area-inset-bottom)
+       is added for devices that report one, but it resolves to 0 unless the
+       viewport meta carries `viewport-fit=cover` - and that meta is Upptime's,
+       not ours - so the fixed 30px is what actually does the work. The env() is
+       belt-and-braces for the home-indicator area, not the mechanism.
+       Reset to 14px at tablet+, where no such toolbar overlays anything. */
     .pb-footer__inner {
-      padding: 14px 20px; display: flex; flex-direction: column-reverse;
+      padding: 14px 20px calc(30px + env(safe-area-inset-bottom, 0px));
+      display: flex; flex-direction: column;
       gap: 10px; align-items: flex-start;
     }
     .pb-footer__brand { display: flex; flex-direction: column; gap: 2px; }
