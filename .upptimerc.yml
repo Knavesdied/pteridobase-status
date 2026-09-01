@@ -1,0 +1,123 @@
+# Pteridobase status monitoring — Upptime configuration.
+#
+# WHY THIS EXISTS. On 1 September 2026 production served pages in 4–47 seconds
+# for roughly five hours and nothing alerted — the owner noticed. Real
+# contributors were using the site throughout. See Knavesdied/Pteridobase#862
+# for the incident record and #864 for this work.
+#
+# WHY IT RUNS ON GITHUB rather than on our own infrastructure: an alert must
+# not share fate with the thing it watches. beta.pteridobase.org and
+# pteridobase.org sit on ONE physical IONOS host — verified, they report the
+# same CPU model, core count and load average — so anything hosted there would
+# have been degraded alongside the site it was meant to be reporting on.
+#
+# Everything here is config-as-code in a public repo: the checks, the uptime
+# history and the incident record are all auditable, rather than living in a
+# vendor's dashboard.
+
+owner: Knavesdied
+repo: pteridobase-status
+
+sites:
+  - name: Pteridobase
+    url: https://pteridobase.org/
+    # DEGRADED above this threshold, not merely DOWN — and that distinction is
+    # the whole point. The 1 September incident returned HTTP 200 throughout:
+    # the site was slow, not broken, so a plain up/down check would have missed
+    # it completely.
+    #
+    # Set from the MEASURED baseline in Pteridobase's
+    # scripts/perf/history/prod.jsonl (26 samples spanning the incident and the
+    # recovery), not from a guess:
+    #
+    #   healthy full page      ~0.24 s
+    #   known transient spike  ~0.73 s   the conservation stats cache
+    #                                    rebuilding on its 10-minute TTL —
+    #                                    expected, see Pteridobase#614
+    #   during the incident    4 – 47 s
+    #
+    # 2000 ms sits comfortably above the known-benign spike and an order of
+    # magnitude below the fault, so it should neither miss a real incident nor
+    # cry wolf. A check people learn to ignore is worse than no check at all.
+    maxResponseTime: 2000
+
+  # TO ADD once Pteridobase#864's health endpoint ships:
+  #
+  #   - name: Pteridobase API
+  #     url: https://pteridobase.org/api/v1/health
+  #     maxResponseTime: 1000
+  #     # Verifies CONTENT, not just the status code. The endpoint returns
+  #     # {"ok":true,…} and 503 when the database is unreachable — but a 200
+  #     # carrying {"ok":false} would otherwise read as healthy.
+  #     __dangerous__body_degraded_if_text_missing: '"ok":true'
+  #
+  # Deliberately NOT monitoring beta: it sits behind HTTP Basic auth and would
+  # answer 401 to every check.
+
+status-website:
+  cname: status.pteridobase.org
+  name: Pteridobase Status
+  theme: light
+
+  # BRANDING — what is configuration and what is not, measured rather than
+  # assumed. Upptime does support `css`, `customHeadHtml`, `themeUrl`,
+  # `favicon` and `faviconSvg`, so a Pteridobase skin does NOT require forking
+  # the Svelte package. But the rendered page exposes exactly ONE CSS custom
+  # property (`--background`) and its class names are minified utilities (`f`,
+  # `r`), which the weekly template update is free to rename. Writing a
+  # stylesheet against those now would be guessing at selectors.
+  #
+  # So the full EFG skin (Merriweather Sans / Georgia, the --efg-* palette) is
+  # deliberately deferred until the page is live and its real markup can be
+  # read in a browser. Deferred, not dropped.
+  # Served by GitHub, NOT hot-linked from pteridobase.org. A logo fetched from
+  # the site being reported on would break during exactly the outage this page
+  # exists to explain.
+  logoUrl: https://raw.githubusercontent.com/Knavesdied/pteridobase-status/main/assets/logo.svg
+  introTitle: "**Pteridobase** platform status"
+  introMessage: >-
+    Live availability and response times for
+    [pteridobase.org](https://pteridobase.org), the Exotic Fern Group's fern
+    taxonomy and conservation platform. Checks run every five minutes from
+    GitHub's infrastructure, independently of Pteridobase's own hosting, so
+    this page stays up when the platform does not. Every incident is recorded
+    as an issue in this repository.
+  navbar:
+    # The key is `href`. Verified from two independent sources rather than
+    # recalled: the upstream template ships `href`, and the renderer
+    # (status-page/src/components/Nav.svelte) reads `item.href`. An earlier
+    # draft of this file used `url` and carried a comment asserting `href` was
+    # the broken form — which would have produced a navbar whose links all go
+    # nowhere, with a comment telling the next reader it was already fixed.
+    - title: Status
+      href: /
+    - title: Pteridobase
+      href: https://pteridobase.org
+    - title: Exotic Fern Group
+      href: https://www.exoticferngroup.org
+
+assignees:
+  - Knavesdied
+
+# NOTIFICATIONS — deliberately NOT configured here, because they cannot be.
+#
+# Upptime reads every notification setting from GITHUB ACTIONS SECRETS, not from
+# this file: uptime.yml passes them through as a SECRETS_CONTEXT blob. There is
+# no `notifications:` key in this config, and writing one has no effect — it
+# would sit here looking configured while nothing sends. Verified by reading
+# .github/workflows/uptime.yml rather than from the documentation.
+#
+# The credential is the owner's to create and never Claude's to handle. The
+# intended channel is SMTP via Resend, already a Pteridobase sub-processor for
+# transactional mail, so it adds no new company to the privacy posture.
+#
+# Set these as repository secrets (Settings -> Secrets and variables -> Actions):
+#
+#   NOTIFICATION_EMAIL             true
+#   NOTIFICATION_EMAIL_STRATEGY    smtp
+#   NOTIFICATION_EMAIL_SMTP_HOST   smtp.resend.com
+#   NOTIFICATION_EMAIL_SMTP_PORT   587
+#   NOTIFICATION_EMAIL_SMTP_USERNAME  resend
+#   NOTIFICATION_EMAIL_SMTP_PASSWORD  <the Resend API key>
+#   NOTIFICATION_EMAIL_FROM        Pteridobase Status <status@pteridobase.org>
+#   NOTIFICATION_EMAIL_TO          <where the alert should land>
