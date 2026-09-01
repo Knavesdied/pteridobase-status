@@ -108,7 +108,7 @@ sites:
   # .invalid is RFC 2606 reserved and can never resolve, so this sends no traffic
   # to production and cannot accidentally succeed.
   - name: ZZ mail path test
-    url: https://zz-upptime-mail-test.invalid/
+    url: https://pteridobase.org/robots.txt
 
   # Deliberately NOT monitoring beta: it sits behind HTTP Basic auth and would
   # answer 401 to every check.
