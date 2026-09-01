@@ -79,12 +79,6 @@ status-website:
   name: Pteridobase Status
   theme: light
 
-  # Build-time only: the generator DOWNLOADS this and emits /logo-192.png and
-  # /logo-512.png, which it then links as icons AFTER our own <link>, so the last
-  # one wins. Pointing it at the Pteridobase site icon is what makes the browser
-  # tab match pteridobase.org. Visitors never fetch this URL - the CI runner does,
-  # once, at build time - so it is not a runtime dependency on another host.
-  logoUrl: https://raw.githubusercontent.com/Knavesdied/pteridobase-status/main/assets/site-icon-192x192.png
 
   # BRANDING. Upptime's status page is a static Svelte site we control through
   # these keys, so matching pteridobase.org is configuration rather than a fork.
@@ -108,6 +102,14 @@ status-website:
   # second host that can fail on its own - and there is no reason to accept that
   # when the page can serve them itself.
 
+  # THE TAB ICON IS OVERWRITTEN, NOT CONFIGURED. Upptime emits its own
+  # <link rel=icon href=/logo-192.png> AFTER ours, so the last one wins and our
+  # data: URI lost. `logoUrl` was tried and did NOT regenerate that file - it
+  # came back byte-identical. So assets/logo-192.png and assets/logo-512.png
+  # simply OVERWRITE the generated ones: post-process copies assets/ over the
+  # export AFTER Sapper runs, which is the same mechanism already serving the
+  # fonts. Whatever link the template emits, the bytes behind it are ours.
+  #
   # The icon is a data: URI, NOT a path. Sapper's exporter crawls HTML links
   # and generates a 404 route for anything it cannot resolve - which creates a
   # DIRECTORY named `site-icon-32x32.png`, and post-process then fails with
