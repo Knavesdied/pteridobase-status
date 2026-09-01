@@ -57,20 +57,25 @@ sites:
     # slow.
     maxResponseTime: 3000
 
-  # TO ADD once Pteridobase#864's health endpoint reaches PRODUCTION. It is built
-  # and verified on beta (both poles: 200 {"ok":true,...}, and 503 {"ok":false}
-  # when the database is unreachable) but /api/v1/health still 404s on production
-  # until the release is promoted. Adding it before then would monitor a URL that
-  # does not exist and report a permanent outage.
-  #
-  #   - name: Pteridobase API
-  #     url: https://pteridobase.org/api/v1/health
-  #     maxResponseTime: 1000
-  #     # Verifies CONTENT, not just the status code. A 200 carrying {"ok":false}
-  #     # would otherwise read as healthy — and the whole reason this endpoint
-  #     # exists is that a 200 from a PAGE proves nothing about the database.
-  #     __dangerous__body_degraded_if_text_missing: '"ok":true'
-  #
+  - name: Pteridobase API
+    url: https://pteridobase.org/api/v1/health
+    # Verifies CONTENT, not just the status code. The endpoint answers 503 when
+    # the database is unreachable, so a status check alone would already catch
+    # that - this guards the case a status check CANNOT see: a 200 carrying
+    # {"ok":false}, or any 200 that is not the endpoint at all (a proxy error
+    # page, a redirect to a login wall). The whole reason this endpoint exists is
+    # that a 200 from a PAGE proves nothing about the database.
+    #
+    # Real key, checked against uptime-monitor's src/update.ts rather than
+    # recalled: it evaluates !data.includes(...) and marks the site DEGRADED.
+    __dangerous__body_degraded_if_text_missing: '"ok":true'
+    #
+    # Measured on production immediately after the v1.8.2 promotion, five
+    # samples: 0.188 - 0.273 s (it is one SELECT 1). 1000 ms is ~3.7x the slowest
+    # sample and an order of magnitude below the 4-47 s seen on 1 September, so it
+    # should neither miss a real incident nor cry wolf.
+    maxResponseTime: 1000
+
   # Deliberately NOT monitoring beta: it sits behind HTTP Basic auth and would
   # answer 401 to every check.
 
