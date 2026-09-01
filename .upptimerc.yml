@@ -79,27 +79,193 @@ status-website:
   name: Pteridobase Status
   theme: light
 
-  # BRANDING — what is configuration and what is not, measured rather than
-  # assumed. Upptime does support `css`, `customHeadHtml`, `themeUrl`,
-  # `favicon` and `faviconSvg`, so a Pteridobase skin does NOT require forking
-  # the Svelte package. But the rendered page exposes exactly ONE CSS custom
-  # property (`--background`) and its class names are minified utilities (`f`,
-  # `r`), which the weekly template update is free to rename. Writing a
-  # stylesheet against those now would be guessing at selectors.
+  # BRANDING. Upptime's status page is a static Svelte site we control through
+  # these keys, so matching pteridobase.org is configuration rather than a fork.
   #
-  # So the full EFG skin (Merriweather Sans / Georgia, the --efg-* palette) is
-  # deliberately deferred until the page is live and its real markup can be
-  # read in a browser. Deferred, not dropped.
-  # Served by GitHub, NOT hot-linked from pteridobase.org. A logo fetched from
-  # the site being reported on would break during exactly the outage this page
-  # exists to explain.
-  logoUrl: https://raw.githubusercontent.com/Knavesdied/pteridobase-status/main/assets/logo.svg
-  introTitle: "**Pteridobase** platform status"
-  introMessage: >-
-    Live availability and response times for
-    [pteridobase.org](https://pteridobase.org), the Exotic Fern Group's fern
-    taxonomy and conservation data platform. Every incident is recorded as an
-    issue in this repository.
+  # EVERY ASSET IS SERVED BY THIS SITE ITSELF. Not one byte the page LOADS comes
+  # from pteridobase.org - a status page that pulls its fonts, logo or icon from
+  # the site it reports on loses them during exactly the outage it exists to
+  # explain. The pteridobase.org URLs below are all LINKS, which is a different
+  # thing: a link that is slow to answer during an incident is expected, and
+  # costs the reader nothing until they click it.
+  #
+  # HOW LOCAL HOSTING WORKS, since it is not obvious and the paths look wrong:
+  # @upptime/status-page's post-process.ts copies the repo's `assets/` directory
+  # into the site export ROOT, recursively. So `assets/fonts/x.woff2` is served
+  # at `/fonts/x.woff2` and `assets/site-icon-32x32.png` at `/site-icon-32x32.png`
+  # - the `assets/` segment does NOT appear in the URL. (`/assets/logo.svg` 404s;
+  # `/logo.svg` is the file.) Same-origin, so no CORS question arises either.
+  #
+  # An earlier draft referenced these through raw.githubusercontent.com. That was
+  # independent of pteridobase.org and would have worked, but it is still a
+  # second host that can fail on its own - and there is no reason to accept that
+  # when the page can serve them itself.
+  favicon: /site-icon-192x192.png
+
+  customHeadHtml: |
+    <link rel="icon" href="/site-icon-32x32.png" sizes="32x32" />
+    <link rel="icon" href="/site-icon-192x192.png" sizes="192x192" />
+    <link rel="apple-touch-icon" href="/site-icon-180x180.png" />
+    <meta name="theme-color" content="#33340e" />
+
+  # The site header. Deliberately WITHOUT the hamburger toggle that
+  # site-header.php carries: that exists because the real nav has five or more
+  # links, and with two they fit at every width. A non-functioning toggle would
+  # be worse than none, since this page ships no JS of its own.
+  customBodyHtml: |
+    <header class="pb-navbar" role="banner">
+      <a class="pb-logo-wrap" href="https://pteridobase.org/" rel="home">
+        <img class="pb-logo-img" src="/efg-logomark-white.svg"
+             alt="Exotic Fern Group logo" width="38" height="38" />
+        <span class="pb-logo-textblock">
+          <span class="pb-logo-text">Pteridobase: An EFG Resource</span>
+          <span class="pb-logo-sub">The conservation and data platform of the Exotic Fern Group</span>
+        </span>
+      </a>
+      <nav class="pb-nav-links" aria-label="Primary navigation">
+        <a href="https://pteridobase.org/">Pteridobase</a>
+        <a href="https://www.exoticferngroup.org/">Exotic Fern Group</a>
+      </nav>
+    </header>
+
+  # The site footer, with the Upptime credit added as a final small-print
+  # segment so it inherits the same separator treatment as the rest of the row.
+  #
+  # NO YEAR IN THE COPYRIGHT, deliberately, and for the same reason
+  # theme/pteridobase/parts/footer.html omits one: this is static content that
+  # cannot call gmdate(), so a hardcoded year is simply a stale one waiting to
+  # happen. A copyright notice does not require a year to be valid.
+  customFootHtml: |
+    <footer class="pb-footer" role="contentinfo">
+      <div class="pb-footer__inner">
+        <div class="pb-footer__brand">
+          <a class="pb-footer__brand-link" href="https://pteridobase.org/" rel="home"><strong>Pteridobase</strong>: An EFG Resource</a>
+          <p class="pb-footer__legalrow">
+            <span>&#169; Exotic Fern Group</span>
+            <span>A charitable incorporated organisation registered in England &amp; Wales</span>
+            <span>Charity no.&#160;1219251</span>
+            <span>Status monitoring by <a href="https://upptime.js.org">Upptime</a> (MIT)</span>
+          </p>
+        </div>
+        <nav class="pb-footer__nav" aria-label="Footer navigation">
+          <a href="https://pteridobase.org/data-sources/">Data Sources</a>
+          <a href="https://pteridobase.org/help/">Help</a>
+          <a href="https://pteridobase.org/credits/">Credits</a>
+          <a href="https://pteridobase.org/api/">API</a>
+          <a href="https://pteridobase.org/terms/">Terms of Use</a>
+          <a href="https://pteridobase.org/privacy/">Privacy Policy</a>
+        </nav>
+      </div>
+    </footer>
+
+  css: |
+    /* ---- Brand faces, self-hosted (see the note above on why) ------------- */
+    @font-face {
+      font-family: 'Merriweather Sans'; font-style: normal; font-weight: 300;
+      font-display: swap; src: url('/fonts/merriweather-sans-300-normal.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Merriweather Sans'; font-style: normal; font-weight: 400;
+      font-display: swap; src: url('/fonts/merriweather-sans-400-normal.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'Merriweather Sans'; font-style: normal; font-weight: 700;
+      font-display: swap; src: url('/fonts/merriweather-sans-700-normal.woff2') format('woff2');
+    }
+
+    /* The EFG palette, reproduced exactly from the brand kit. Same token names
+       as theme/pteridobase/assets/css/homepage.css so the two read alike. */
+    :root {
+      --efg-verdun-green: #336600;
+      --efg-camouflage:   #33340e;
+      --pb-orange:        #d8613c;
+      --pb-font-sans:  'Merriweather Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --pb-font-serif: Georgia, 'Times New Roman', Times, serif;
+    }
+
+    /* Upptime ships its own bare <nav> and <footer>. Ours replace them.
+       Matched with :not() rather than a child selector so this keeps working if
+       the generator changes where they sit in the tree. */
+    nav:not(.pb-nav-links), footer:not(.pb-footer) { display: none !important; }
+
+    body {
+      font-family: var(--pb-font-serif);
+      background: #ffffff;
+      margin: 0;
+    }
+    main { padding: 0 20px 48px; }
+    h1, h2, h3, h4 { font-family: var(--pb-font-sans); font-weight: 700; }
+    main a { color: var(--efg-verdun-green); }
+
+    /* ---- Navbar ----------------------------------------------------------- */
+    /* SOLID Camouflage, not the homepage's translucent black: that treatment
+       only reads correctly over the hero photograph, and over a white page it
+       looks like flat grey. This is the same choice
+       `body.pb-search-page .pb-navbar` makes on the site itself.
+       sticky rather than the site's `fixed`, because fixed needs a matching
+       body padding-top that the site computes in JS and this page has none. */
+    .pb-navbar {
+      background: var(--efg-camouflage);
+      color: #ffffff;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .pb-logo-wrap { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .pb-logo-img { width: 38px; height: 38px; flex-shrink: 0; display: block; }
+    .pb-logo-textblock { display: flex; flex-direction: column; line-height: 1.2; }
+    .pb-logo-text { font-family: var(--pb-font-sans); font-weight: 700; font-size: 13px; color: #ffffff; }
+    .pb-logo-sub  { display: none; font-family: var(--pb-font-sans); font-size: 9px; font-weight: 300; color: rgba(255,255,255,0.75); }
+    .pb-nav-links { display: flex; flex-direction: row; gap: 20px; font-family: var(--pb-font-sans); font-size: 14px; }
+    .pb-nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; }
+    .pb-nav-links a:hover, .pb-nav-links a:focus { color: #ffffff; text-decoration: underline; }
+
+    /* ---- Footer ----------------------------------------------------------- */
+    .pb-footer { background: var(--efg-verdun-green); color: #fff; }
+    .pb-footer__inner {
+      padding: 14px 20px; display: flex; flex-direction: column-reverse;
+      gap: 10px; align-items: flex-start;
+    }
+    .pb-footer__brand { display: flex; flex-direction: column; gap: 2px; }
+    .pb-footer__brand-link { font-family: var(--pb-font-sans); font-weight: 400; font-size: 13px; color: #fff; text-decoration: none; }
+    .pb-footer__brand-link strong { font-weight: 700; }
+    /* The disappearing-middot row, carried over from the site (#805). Each
+       segment is a flex item; the separator is an absolutely-positioned
+       ::before pinned to the segment's left edge, so it sits inside the column
+       gap and is CLIPPED when a segment starts a new line.
+       0.75 alpha is a FLOOR, not a default: white on #336600 measures 4.68:1
+       there and 4.29:1 at 0.70, so anything quieter drops a statutory
+       disclosure below WCAG AA. min-width:0 is load-bearing WITH the clipping,
+       or a long segment would overflow and the disclosure would be cut off. */
+    .pb-footer__legalrow {
+      display: flex; flex-wrap: wrap; gap: 2px 0.85em; overflow: hidden; margin: 0;
+      font-family: var(--pb-font-sans); font-size: 11px; color: rgba(255,255,255,0.75);
+    }
+    .pb-footer__legalrow > span { position: relative; min-width: 0; }
+    .pb-footer__legalrow > span + span::before {
+      content: "\00B7"; position: absolute; right: 100%; width: 0.85em;
+      text-align: center; color: inherit;
+    }
+    .pb-footer__legalrow a { color: inherit; text-decoration: underline; }
+    .pb-footer__nav { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px 20px; }
+    .pb-footer__nav a { font-family: var(--pb-font-sans); font-size: 13px; color: #fff; text-decoration: none; }
+    .pb-footer__nav a:hover, .pb-footer__nav a:focus { text-decoration: underline; }
+
+    @media (min-width: 768px) {
+      .pb-logo-sub { display: block; }
+      .pb-footer__inner { padding: 14px 32px; flex-direction: row; justify-content: space-between; align-items: center; gap: 32px; }
+      main { padding: 0 32px 48px; }
+    }
+    @media (min-width: 1024px) {
+      .pb-footer__inner { padding: 14px 48px; }
+      main { padding: 0 48px 48px; }
+    }
+
   navbar:
     # The key is `href`. Verified from two independent sources rather than
     # recalled: the upstream template ships `href`, and the renderer
