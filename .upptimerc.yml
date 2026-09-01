@@ -79,6 +79,20 @@ status-website:
   name: Pteridobase Status
   theme: light
 
+  # The page's own introduction. Restored after being dropped when this block was
+  # rewritten for the branding - the <header> in <main> rendered empty and the
+  # page opened straight into the status cards.
+  #
+  # Wording is as agreed: "conservation DATA platform", and WITHOUT the sentence
+  # about checks running every five minutes from GitHub's infrastructure, which
+  # was a technical explanation the reader does not need.
+  introTitle: "**Pteridobase** platform status"
+  introMessage: >-
+    Live availability and response times for
+    [pteridobase.org](https://pteridobase.org), the Exotic Fern Group's fern
+    taxonomy and conservation data platform. Every incident is recorded as an
+    issue in this repository.
+
 
   # BRANDING. Upptime's status page is a static Svelte site we control through
   # these keys, so matching pteridobase.org is configuration rather than a fork.
