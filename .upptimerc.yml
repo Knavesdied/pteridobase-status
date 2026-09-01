@@ -293,7 +293,12 @@ status-website:
     .pb-logo-textblock { display: flex; flex-direction: column; line-height: 1.2; }
     .pb-logo-text { font-family: var(--pb-font-sans); font-weight: 700; font-size: 13px; color: #ffffff; }
     .pb-logo-sub  { display: none; font-family: var(--pb-font-sans); font-size: 9px; font-weight: 300; color: rgba(255,255,255,0.75); }
-    .pb-nav-links { display: flex; flex-direction: row; gap: 20px; font-family: var(--pb-font-sans); font-size: 14px; }
+    /* 11px / 18px gap, MEASURED off pteridobase.org/help/ rather than copied from
+       the stylesheet: homepage.css's `.pb-nav-links { font-size: 14px }` is the
+       MOBILE dropdown-panel rule, and a tablet+ media query overrides it to 11px
+       for the horizontal bar. Reading the first matching rule gave the wrong
+       number; the rendered page gave the right one. */
+    .pb-nav-links { display: flex; flex-direction: row; gap: 18px; font-family: var(--pb-font-sans); font-size: 11px; }
     .pb-nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; }
     .pb-nav-links a:hover, .pb-nav-links a:focus { color: #ffffff; text-decoration: underline; }
 
