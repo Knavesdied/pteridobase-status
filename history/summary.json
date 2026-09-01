@@ -10,11 +10,11 @@
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
-    "time": 909,
-    "timeDay": 909,
-    "timeWeek": 909,
-    "timeMonth": 909,
-    "timeYear": 909,
+    "time": 896,
+    "timeDay": 896,
+    "timeWeek": 896,
+    "timeMonth": 896,
+    "timeYear": 896,
     "dailyMinutesDown": {}
   },
   {
@@ -28,11 +28,11 @@
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
-    "time": 564,
-    "timeDay": 564,
-    "timeWeek": 564,
-    "timeMonth": 564,
-    "timeYear": 564,
+    "time": 540,
+    "timeDay": 540,
+    "timeWeek": 540,
+    "timeMonth": 540,
+    "timeYear": 540,
     "dailyMinutesDown": {}
   },
   {
@@ -46,31 +46,11 @@
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
-    "time": 467,
-    "timeDay": 467,
-    "timeWeek": 467,
-    "timeMonth": 467,
-    "timeYear": 467,
+    "time": 459,
+    "timeDay": 459,
+    "timeWeek": 459,
+    "timeMonth": 459,
+    "timeYear": 459,
     "dailyMinutesDown": {}
-  },
-  {
-    "name": "ZZ mail path test",
-    "url": "https://pteridobase.org/robots.txt",
-    "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
-    "slug": "zz-mail-path-test",
-    "status": "up",
-    "uptime": "17.48%",
-    "uptimeDay": "17.48%",
-    "uptimeWeek": "17.48%",
-    "uptimeMonth": "17.48%",
-    "uptimeYear": "17.48%",
-    "time": 561,
-    "timeDay": 561,
-    "timeWeek": 561,
-    "timeMonth": 561,
-    "timeYear": 561,
-    "dailyMinutesDown": {
-      "2026-09-01": 2
-    }
   }
 ]
