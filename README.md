@@ -3,7 +3,7 @@
 Uptime monitoring and the public status page for
 **[pteridobase.org](https://pteridobase.org)** — the
 [Exotic Fern Group](https://www.exoticferngroup.org)'s fern taxonomy and
-conservation platform.
+conservation data platform.
 
 Status page: **[status.pteridobase.org](https://status.pteridobase.org)**
 

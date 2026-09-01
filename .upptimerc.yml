@@ -78,7 +78,7 @@ status-website:
   introMessage: >-
     Live availability and response times for
     [pteridobase.org](https://pteridobase.org), the Exotic Fern Group's fern
-    taxonomy and conservation platform. Checks run every five minutes from
+    taxonomy and conservation data platform. Checks run every five minutes from
     GitHub's infrastructure, independently of Pteridobase's own hosting, so
     this page stays up when the platform does not. Every incident is recorded
     as an issue in this repository.
