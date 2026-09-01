@@ -177,42 +177,61 @@ status-website:
     <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAEpklEQVRYhe3XXWxTZRzH8W97Ttt1fV/Xdm3ZVvbSrt06xroNQQYMRiwGRCLohXil1yYmRu+IdxqiV8QrE73AC8VEMxNAQwKMQOJ4meFlAycbYzDW0W7d2rXbTl+OFyQ1yMABNYvG5+rk9895/p/8T56TPIpQm1FmBZdyJZv/D/hHAF1du1AoFCsHeGXXfvwNLSsHkOU8raGNxQG8tf9dSkv1j62Hw6+jUqkfykSVmrGxm8UBeH1B9r729pI1rVZHR8dmamv8D+Xx6Si5XK44gJ6ew+zd+86SU9BqdRj0ZnwNzYXM4/HidFahLSktDuDy5V8wGEyEX9r3SK2uLkBpqQ5QoFQ+2KauNoDN5mRVZU1xAJmMRH//OQKBtY/UrFY7+XyeLVt2UlZmA0Cl1pBKJbDbXQXUcwEABgYv4fF40emMhcxotLCuowtZztPXd5LFxUXgwT8AFJRoShAEsTgAf0MLq1atZsP6bQ/ll6/0IUkSPm8zG9Z3A3Du7M8YDCYqK2uxmMuLAzj+03ckk7MoBaGQ1dc30tQYwmarYGjoKkO/XwVAyiySy2VRCgL19Y3FAchynvn5NGaztZAJgshsIs78Qhq93ogkLRZyQRBRqzRYyysQRdXzA9xuD+l0krZQJ1qtDoCZmSni8SkykkQg0IrTWQnAyMgNxsaGiUzeJZ1OYjKVFfYJBtuXD3C5qgvPkchd9HojJlMZPt+DM59IzNAcbEevN3K69yharR6DwUw4vI/W1hcxGS0YDRaSyVkAOjeGqatb+pMsCejsDBeOViwa4c7dW9hsTrZ378FgMFNb60ejKUGt1uDzBtGWaPH5gsSiEe7fH2d0dAibzcnalvWoVGpCoY3cnxxfEiC4XJqP/hqWaLR8+MFnnDz5I9PTUaKxCLU1fqxWO4IostrjA2SMRgu5fI75+RT5XJ7t2/dQWVWHXm/gyJEvuHjpDJs37WBNywv0njlGPB5b3gSisQjz8ykOHPic1TU+nBWVJBJxGhpaWNO8jsHrv5LNZlmUFii3OnA5q2lr68Ra7iAycYfkXIJNm1+murqenTvfJBaNMDU1ufwJzM5OY7ZY8TesZdvW3ajUGu7du43X24TD4aapqZ1kMo7BYEYURVLpORobQ5hNVq4NXEShUKLVlrIj/AYjIzc4euwbxsdHlw8AiEYjBIPtuFzVqFVq7HY32ayETmdgYmKMWCzCwkKaXC7Ptq27MRktzM0lqK6qY+LeGC5XFWqVmuPHv+XChd4lmz8RIEkLzKWSWK12pIzEmuYORm/fpKqyFrfbQyDQilqtoampDVnOMzsbRykIJBJxpqYmmZwc5+NP3uPK1fOPbQ7w2B92JiNx/vwpRoav0939KtLiAg6Hm2RyBqu1AlnO43JVo1AoyGYzKJVKbt36jVQ6yeGvDzEwcOmJjf92AgCyLJNKJRkZuUE0NsHgYD9+fyvl5Q4ik+N8+dWniCoVbpeH071H6ek5TF/fKa5du7is5gCKp7kZiaKKQ4e+Z3R0iIMH30eWZXy+Zrq6dnHixA8MDw8uu/EzAQAaAyEGr/cjy3++JggiuVz2qZs/E6DY6793M/rXAf4AR7+aNjJ2FmkAAAAASUVORK5CYII=" />
     <meta name="theme-color" content="#33340e" />
     <script>
-      /* UTC EVERYWHERE. Upptime formats every timestamp with
-         toLocaleString(config.i18n.locale) - the locale argument controls FORMAT
-         only, and the zone comes from the viewer's browser. There is no config
-         key for it: the timeZone OPTION is the only lever ECMA-402 offers, and
-         Upptime never passes options.
+      /* ISO-STYLE UTC EVERYWHERE: "2026-09-01 19:55 UTC".
 
-         The BCP-47 extension `en-GB-u-tz-utc` looks like the answer and is NOT -
-         measured, Chrome ignores the tz key entirely and resolvedOptions() still
-         reports Europe/London. So this overrides the two methods directly.
+         WHY AN OVERRIDE AT ALL. Upptime formats every timestamp with
+         toLocaleString(config.i18n.locale). The locale argument controls FORMAT
+         only - the zone comes from the viewer's browser, and there is no config
+         key for it, because the timeZone OPTION is the only lever ECMA-402
+         offers and Upptime never passes options.
 
-         timeZoneName:'short' is deliberate: it renders "19:55:33 UTC" rather
-         than a bare time. An UNLABELLED UTC timestamp is worse than a local one,
-         because it looks like local time and quietly is not - exactly the trap
-         when someone correlates this chart against a server log.
+         `en-GB-u-tz-utc` looks like the answer and is NOT: measured, Chrome
+         ignores the BCP-47 tz extension entirely and resolvedOptions() still
+         reports the local zone. Hence overriding the methods directly.
 
-         This is a monkey-patch on a built-in and affects every date on the page,
-         incidents included. That is wanted here: a status page read across
-         timezones should state one zone throughout. */
+         sv-SE is chosen for its FORMAT, not its language: it is the locale whose
+         date pattern is already yyyy-mm-dd with a 24-hour clock and no comma, so
+         the requested shape falls out without hand-assembling a string. The
+         explicit field list pins it regardless, so a locale-data change cannot
+         quietly alter the output.
+
+         timeZoneName:'short' is set explicitly even though Chrome happened to
+         append "UTC" without it - relying on that would be relying on a quirk,
+         and an UNLABELLED UTC timestamp is worse than a local one: it looks like
+         local time and quietly is not, which is the trap when someone correlates
+         this against a server log.
+
+         This supersedes i18n.locale for dates. That key still governs Upptime's
+         own UI strings, which is why it stays set.
+
+         It is a monkey-patch on a built-in and affects every date on the page,
+         incidents included. That is wanted: a status page read across timezones
+         should state one zone throughout. */
       (function () {
         var LS = Date.prototype.toLocaleString,
             LDS = Date.prototype.toLocaleDateString,
-            LTS = Date.prototype.toLocaleTimeString;
-        function utc(o, withZone) {
-          o = o || {};
-          o.timeZone = 'UTC';
-          if (withZone && !o.timeZoneName) o.timeZoneName = 'short';
+            LTS = Date.prototype.toLocaleTimeString,
+            L = 'sv-SE',
+            DATE = { year: 'numeric', month: '2-digit', day: '2-digit' },
+            TIME = { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
+        function opts(base, caller) {
+          var o = {}, k;
+          for (k in base) o[k] = base[k];
+          for (k in caller || {}) o[k] = caller[k];
+          o.timeZone = 'UTC';           /* never overridable: the whole point */
           return o;
         }
         Date.prototype.toLocaleString = function (l, o) {
-          return LS.call(this, l || 'en-GB', utc(o, true));
+          var m = {}, k;
+          for (k in DATE) m[k] = DATE[k];
+          for (k in TIME) m[k] = TIME[k];
+          return LS.call(this, L, opts(m, o));
         };
         Date.prototype.toLocaleDateString = function (l, o) {
-          return LDS.call(this, l || 'en-GB', utc(o, false));
+          return LDS.call(this, L, opts(DATE, o));
         };
         Date.prototype.toLocaleTimeString = function (l, o) {
-          return LTS.call(this, l || 'en-GB', utc(o, true));
+          return LTS.call(this, L, opts(TIME, o));
         };
       })();
     </script>
