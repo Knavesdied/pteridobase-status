@@ -78,10 +78,8 @@ status-website:
   introMessage: >-
     Live availability and response times for
     [pteridobase.org](https://pteridobase.org), the Exotic Fern Group's fern
-    taxonomy and conservation data platform. Checks run every five minutes from
-    GitHub's infrastructure, independently of Pteridobase's own hosting, so
-    this page stays up when the platform does not. Every incident is recorded
-    as an issue in this repository.
+    taxonomy and conservation data platform. Every incident is recorded as an
+    issue in this repository.
   navbar:
     # The key is `href`. Verified from two independent sources rather than
     # recalled: the upstream template ships `href`, and the renderer
