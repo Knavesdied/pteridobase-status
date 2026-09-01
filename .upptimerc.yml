@@ -301,6 +301,17 @@ status-website:
     .pb-nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; }
     .pb-nav-links a:hover, .pb-nav-links a:focus { color: #ffffff; text-decoration: underline; }
 
+    /* The 24h / 7d / 30d / 1y / all period controls. They are <label>s tied to
+       radio inputs and inherit the body serif, which left them the only UI
+       control on the page not in the brand sans.
+
+       Keyed on the INPUT ID PREFIX, not on the Svelte class. Every element here
+       also carries a hashed class like `svelte-fqsq6s`, and that hash is
+       regenerated whenever the component is rebuilt - a rule written against it
+       would stop matching on some future Upptime bump, silently and with no
+       error. `data_` ids are semantic and stable. */
+    main form label[for^="data_"] { font-family: var(--pb-font-sans); }
+
     /* ---- Response-time chart ----------------------------------------------
        The sparkline behind each card is a generated PNG, not a client-side
        chart, so Upptime's graphBackgroundColor/graphBorderColor keys do NOT
