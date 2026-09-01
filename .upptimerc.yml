@@ -41,14 +41,34 @@ sites:
     # cry wolf. A check people learn to ignore is worse than no check at all.
     maxResponseTime: 2000
 
-  # TO ADD once Pteridobase#864's health endpoint ships:
+  - name: Exotic Fern Group
+    url: https://www.exoticferngroup.org/
+    # The parent charity's own site. Not ours to fix, which is exactly why the
+    # threshold is looser than Pteridobase's: an alert we cannot act on is noise,
+    # and the useful question here is "is it down or badly broken?", not "is it
+    # 200ms slower than yesterday?".
+    #
+    # Measured before choosing, five samples on 1 September 2026: 0.37-0.40s warm,
+    # 1.13s on a cold connection (TTFB 0.09-0.67s). 3000ms clears the cold case
+    # with room to spare.
+    #
+    # The `www` host is monitored deliberately: the apex 301s to it, and following
+    # a redirect on every check would measure two hops and report the wrong one as
+    # slow.
+    maxResponseTime: 3000
+
+  # TO ADD once Pteridobase#864's health endpoint reaches PRODUCTION. It is built
+  # and verified on beta (both poles: 200 {"ok":true,...}, and 503 {"ok":false}
+  # when the database is unreachable) but /api/v1/health still 404s on production
+  # until the release is promoted. Adding it before then would monitor a URL that
+  # does not exist and report a permanent outage.
   #
   #   - name: Pteridobase API
   #     url: https://pteridobase.org/api/v1/health
   #     maxResponseTime: 1000
-  #     # Verifies CONTENT, not just the status code. The endpoint returns
-  #     # {"ok":true,…} and 503 when the database is unreachable — but a 200
-  #     # carrying {"ok":false} would otherwise read as healthy.
+  #     # Verifies CONTENT, not just the status code. A 200 carrying {"ok":false}
+  #     # would otherwise read as healthy — and the whole reason this endpoint
+  #     # exists is that a 200 from a PAGE proves nothing about the database.
   #     __dangerous__body_degraded_if_text_missing: '"ok":true'
   #
   # Deliberately NOT monitoring beta: it sits behind HTTP Basic auth and would
