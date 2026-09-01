@@ -83,15 +83,10 @@ status-website:
   # rewritten for the branding - the <header> in <main> rendered empty and the
   # page opened straight into the status cards.
   #
-  # Wording is as agreed: "conservation DATA platform", and WITHOUT the sentence
-  # about checks running every five minutes from GitHub's infrastructure, which
-  # was a technical explanation the reader does not need.
+  # TITLE ONLY, no introMessage. The descriptive paragraph was removed at the
+  # owner's request: the page's job is to show whether things are up, and a
+  # visitor who has navigated to a status page does not need it explained.
   introTitle: "**Pteridobase** platform status"
-  introMessage: >-
-    Live availability and response times for
-    [pteridobase.org](https://pteridobase.org), the Exotic Fern Group's fern
-    taxonomy and conservation data platform. Every incident is recorded as an
-    issue in this repository.
 
 
   # BRANDING. Upptime's status page is a static Svelte site we control through
@@ -177,12 +172,7 @@ status-website:
           </p>
         </div>
         <nav class="pb-footer__nav" aria-label="Footer navigation">
-          <a href="https://pteridobase.org/data-sources/">Data Sources</a>
-          <a href="https://pteridobase.org/help/">Help</a>
           <a href="https://pteridobase.org/credits/">Credits</a>
-          <a href="https://pteridobase.org/api/">API</a>
-          <a href="https://pteridobase.org/terms/">Terms of Use</a>
-          <a href="https://pteridobase.org/privacy/">Privacy Policy</a>
         </nav>
       </div>
     </footer>
@@ -227,7 +217,14 @@ status-website:
        of ours inherited - painting a white block over the Camouflage navbar and
        the green footer. Reset it explicitly rather than relying on our own rules
        to happen to override a selector we do not control. */
-    .pb-nav-links, .pb-footer__nav { background: transparent; }
+    /* Upptime styles the bare `nav` element with a white background AND a
+       1px bottom border, both of which ours inherited: a white block over the
+       Camouflage navbar, and a rule that reads as a stray underline - drawn
+       across the whole CONTAINER, which is why it ran well past the last link.
+       Measured, not guessed: every <a> reports text-decoration: none, so the
+       line was never an underline at all. Reset explicitly rather than trusting
+       our own rules to beat a selector we do not control. */
+    .pb-nav-links, .pb-footer__nav { background: transparent; border: 0; }
 
     body {
       font-family: var(--pb-font-serif);
@@ -257,7 +254,9 @@ status-website:
       max-width: 1100px;
       margin: 0 auto;
       box-sizing: border-box;
-      padding: 0 20px 48px;
+      /* The title sat flush against the navbar - measured gap 0px, because the
+         navbar is sticky and <main> had no top padding. */
+      padding: 32px 20px 48px;
     }
     h1, h2, h3, h4 { font-family: var(--pb-font-sans); font-weight: 700; }
     main a { color: var(--efg-verdun-green); }
@@ -336,11 +335,11 @@ status-website:
     @media (min-width: 768px) {
       .pb-logo-sub { display: block; }
       .pb-footer__inner { padding: 14px 32px; flex-direction: row; justify-content: space-between; align-items: center; gap: 32px; }
-      #sapper > main { padding: 0 32px 48px; }
+      #sapper > main { padding: 40px 32px 48px; }
     }
     @media (min-width: 1024px) {
       .pb-footer__inner { padding: 14px 48px; }
-      #sapper > main { padding: 0 48px 48px; }
+      #sapper > main { padding: 40px 48px 48px; }
     }
 
   navbar:
