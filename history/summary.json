@@ -55,22 +55,22 @@
   },
   {
     "name": "ZZ mail path test",
-    "url": "https://zz-upptime-mail-test.invalid/",
-    "icon": "https://icons.duckduckgo.com/ip3/zz-upptime-mail-test.invalid.ico",
+    "url": "https://pteridobase.org/robots.txt",
+    "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
     "slug": "zz-mail-path-test",
-    "status": "down",
-    "uptime": "69.19%",
-    "uptimeDay": "69.19%",
-    "uptimeWeek": "69.19%",
-    "uptimeMonth": "69.19%",
-    "uptimeYear": "69.19%",
-    "time": 0,
-    "timeDay": 0,
-    "timeWeek": 0,
-    "timeMonth": 0,
-    "timeYear": 0,
+    "status": "up",
+    "uptime": "17.48%",
+    "uptimeDay": "17.48%",
+    "uptimeWeek": "17.48%",
+    "uptimeMonth": "17.48%",
+    "uptimeYear": "17.48%",
+    "time": 561,
+    "timeDay": 561,
+    "timeWeek": 561,
+    "timeMonth": 561,
+    "timeYear": 561,
     "dailyMinutesDown": {
-      "2026-09-01": 0
+      "2026-09-01": 2
     }
   }
 ]
