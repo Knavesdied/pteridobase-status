@@ -59,16 +59,18 @@
     "icon": "https://icons.duckduckgo.com/ip3/zz-upptime-mail-test.invalid.ico",
     "slug": "zz-mail-path-test",
     "status": "down",
-    "uptime": "100.00%",
-    "uptimeDay": "100.00%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
+    "uptime": "99.43%",
+    "uptimeDay": "99.43%",
+    "uptimeWeek": "99.43%",
+    "uptimeMonth": "99.43%",
+    "uptimeYear": "99.43%",
     "time": 582,
     "timeDay": 582,
     "timeWeek": 582,
     "timeMonth": 582,
     "timeYear": 582,
-    "dailyMinutesDown": {}
+    "dailyMinutesDown": {
+      "2026-09-01": 0
+    }
   }
 ]
