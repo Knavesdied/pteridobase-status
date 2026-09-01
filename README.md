@@ -59,5 +59,26 @@ Everything lives in [`.upptimerc.yml`](./.upptimerc.yml), commented with the
 reasoning rather than only the values. Changes are commits: reviewable,
 revertible, and auditable by anyone.
 
-Note the prose above deliberately sits **outside** Upptime's
-`This repository contains the open-source uptime monitor and status page for [David Keens](https://status.pteridobase.org), powered by [Upptime](https://github.com/upptime/upptime).undefined
+### A trap worth knowing before editing this file
+
+Upptime rewrites parts of this README on a schedule, between HTML comment markers
+named `description`, `docs`, `logo` and `status pages`. Only the status-pages
+block is wanted here; the prose above deliberately sits outside all of them, so
+it survives the sync.
+
+**Do not write those marker names in their literal comment form anywhere in this
+file, even to explain them.** An earlier draft of this very section did exactly
+that, and the generator matched the explanation as if it were a real marker: it
+substituted template text into the middle of the sentence and truncated
+everything after it, destroying the Licence section below. The paragraph
+describing the trap was the thing that sprang it.
+
+Note also that the generated description names the **GitHub account holder** by
+personal name. That is another reason this README carries its own prose rather
+than the generated blurb.
+
+## Licence
+
+Upptime is MIT and the uptime data under `history/` is Open Database License,
+per the upstream template. The EFG logomark in `assets/` belongs to the Exotic
+Fern Group and is not covered by either.
