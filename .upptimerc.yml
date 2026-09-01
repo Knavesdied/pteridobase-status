@@ -99,6 +99,17 @@ sites:
     # should neither miss a real incident nor cry wolf.
     maxResponseTime: 1000
 
+  # TEMPORARY - MAIL PATH TEST, remove immediately after (Refs #864).
+  # Upptime notifies on a STATE CHANGE, not on every check, so with everything up
+  # the mail configuration cannot be distinguished from a broken one. This entry
+  # forces a down transition so the whole chain is exercised: SMTP auth, Resend
+  # domain verification, delivery.
+  #
+  # .invalid is RFC 2606 reserved and can never resolve, so this sends no traffic
+  # to production and cannot accidentally succeed.
+  - name: ZZ mail path test
+    url: https://zz-upptime-mail-test.invalid/
+
   # Deliberately NOT monitoring beta: it sits behind HTTP Basic auth and would
   # answer 401 to every check.
 
