@@ -301,6 +301,33 @@ status-website:
     .pb-nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; }
     .pb-nav-links a:hover, .pb-nav-links a:focus { color: #ffffff; text-decoration: underline; }
 
+    /* ---- Response-time chart ----------------------------------------------
+       The sparkline behind each card is a generated PNG, not a client-side
+       chart, so Upptime's graphBackgroundColor/graphBorderColor keys do NOT
+       reach it - those style the Chart.js graph on the history page. The PNG
+       comes from a separate @upptime/graphs package, so recolouring at source
+       would mean forking it.
+
+       Recoloured here instead, with two constraints that ruled out the obvious
+       approaches:
+         - background-blend-mode floods the whole card. The PNG's empty area is
+           WHITE, not transparent, so blending tints every pixel of it.
+         - a filter on the article itself would recolour the TEXT too.
+       So the image moves onto a ::before layer that carries the filter alone,
+       and the card's content is lifted above it. pointer-events stays off so
+       the card remains clickable.
+
+       -78deg takes the stock teal (#89e0cf, hue ~165) to Verdun Green's hue,
+       and the desaturation keeps it a light TINT - it sits behind the uptime
+       figures, so it has to stay readable rather than match #336600 exactly. */
+    article.graph { position: relative; background-image: none !important; }
+    article.graph::before {
+      content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background: var(--background) no-repeat 100% 50% / contain;
+      filter: hue-rotate(-78deg) saturate(0.75);
+    }
+    article.graph > * { position: relative; z-index: 1; }
+
     /* ---- Footer ----------------------------------------------------------- */
     .pb-footer { background: var(--efg-verdun-green); color: #fff; }
     .pb-footer__inner {
