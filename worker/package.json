@@ -1,0 +1,15 @@
+{
+  "name": "pteridobase-uptime-dispatcher",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Cron-driven dispatcher that keeps Upptime's checks running at a real 5-minute cadence (Pteridobase#869)",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev --test-scheduled",
+    "tail": "wrangler tail",
+    "whoami": "wrangler whoami"
+  },
+  "devDependencies": {
+    "wrangler": "^4.128.0"
+  }
+}

@@ -1,0 +1,53 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "pteridobase-uptime-dispatcher",
+	"main": "src/index.js",
+	"compatibility_date": "2026-09-01",
+
+	// Pinned rather than inferred. The account carries other Workers (davidkeens-yoga,
+	// davidkeens-yoga-www) and wrangler has to resolve an account for every deploy;
+	// naming it removes the ambiguity and makes a wrong-account deploy impossible.
+	// Not a secret — an account id authorises nothing on its own.
+	"account_id": "2b19174cc237730533b7b064ad1b89a1",
+
+	// The whole point of the Worker. GitHub's own */5 cron on uptime.yml delivers
+	// 2-3% of its firings (Pteridobase#869); Cloudflare's scheduler is what actually
+	// runs every five minutes.
+	//
+	// A measured caveat, so nobody chases it as a fault: all eight Upptime workflows
+	// share ONE concurrency group with cancel-in-progress false, and GitHub keeps only
+	// one PENDING run per group — surplus dispatches are discarded, not queued. Uptime
+	// CI completes in 14-15s so this is normally slack, but the daily workflows
+	// (00:00, 01:00, 03:00, 23:00 UTC) will eat a check when they collide.
+	"triggers": {
+		"crons": ["*/5 * * * *"]
+	},
+
+	// Every one of these is a VAR, not a secret, and deliberately so: the repo path is
+	// the thing that changes when Pteridobase#865 moves this repo to an organisation,
+	// and a repoint should be a config edit plus a deploy, never a code change.
+	//
+	// GH_WORKFLOW is the workflow FILENAME, which is what the dispatches endpoint takes.
+	// GH_REF must be a branch that exists — a wrong one returns 422 rather than failing
+	// silently, which is why workflow_dispatch was chosen over repository_dispatch.
+	"vars": {
+		"GH_OWNER": "Knavesdied",
+		"GH_REPO": "pteridobase-status",
+		"GH_WORKFLOW": "uptime.yml",
+		"GH_REF": "main",
+
+		// Minutes. Above this with no run of GH_WORKFLOW, the Worker logs an error even
+		// though its own POSTs are returning 204 — the "succeeds but does nothing" case.
+		// 20 = four missed five-minute ticks, loose enough to tolerate one concurrency
+		// eviction without crying wolf.
+		"STALE_AFTER_MIN": "20"
+	},
+
+	// Without this the only way to see a failure is to be watching `wrangler tail` at
+	// the moment it happens — which, for a thing that runs every five minutes
+	// unattended, is the same as not seeing it at all.
+	"observability": {
+		"enabled": true,
+		"head_sampling_rate": 1
+	}
+}
