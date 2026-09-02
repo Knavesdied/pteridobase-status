@@ -535,11 +535,30 @@ assignees:
 #
 # Set these as repository secrets (Settings -> Secrets and variables -> Actions):
 #
-#   NOTIFICATION_EMAIL             true
-#   NOTIFICATION_EMAIL_STRATEGY    smtp
+#   NOTIFICATION_EMAIL_SMTP        true
+#        ^^ REQUIRED, AND THE WHOLE CHANNEL HANGS OFF IT. notifme.ts builds
+#        channels.email ONLY if one of _SENDGRID/_SES/_SPARKPOST/_MAILGUN/_SMTP is
+#        set. Without it the mailer is never constructed: nothing is sent, nothing
+#        is logged, nothing throws, and the run still succeeds. The line
+#        "Sending notification ..." prints UNCONDITIONALLY, before the channel is
+#        consulted -- so it is NOT evidence of a send. The line that proves the
+#        channel exists is "Sending email"; "Success email" means the SMTP server
+#        returned 250. Grep for those two, never for "Sending notification".
+#   NOTIFICATION_EMAIL_STRATEGY    fallback
+#        ^^ notifme's multiProviderStrategy. ONLY fallback|roundrobin|no-fallback
+#        are legal; any other value THROWS at `new NotifmeSdk()`, which runs at
+#        module top level outside any try/catch, so it fails the entire job rather
+#        than just email. Irrelevant with a single provider -- but it must parse.
 #   NOTIFICATION_EMAIL_SMTP_HOST   smtp.resend.com
 #   NOTIFICATION_EMAIL_SMTP_PORT   587
+#        ^^ 587 = STARTTLS, which is what nodemailer does by default (it only
+#        auto-enables implicit TLS on 465). Do not "fix" this to 465 without also
+#        forcing secure:true -- a mismatch fails the handshake outright.
 #   NOTIFICATION_EMAIL_SMTP_USERNAME  resend
 #   NOTIFICATION_EMAIL_SMTP_PASSWORD  <the Resend API key>
-#   NOTIFICATION_EMAIL_FROM        Pteridobase Status <status@pteridobase.org>
+#   NOTIFICATION_EMAIL_FROM        Pteridobase Status <status@mail.pteridobase.org>
+#        ^^ THE SUBDOMAIN, NOT THE APEX. mail.pteridobase.org is the domain verified
+#        in Resend; pteridobase.org is NOT, and sending from it is rejected at the
+#        DATA stage with "550 The pteridobase.org domain is not verified".
+#   NOTIFICATION_EMAIL             (optional -- a fallback for FROM/TO only; NOT a gate)
 #   NOTIFICATION_EMAIL_TO          <where the alert should land>
