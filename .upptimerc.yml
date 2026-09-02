@@ -101,7 +101,7 @@ sites:
 
   # TEMPORARY - MAIL PATH RETEST after fixing the FROM domain. Remove after.
   - name: ZZ mail path test
-    url: https://zz-upptime-mail-test.invalid/
+    url: https://pteridobase.org/robots.txt
   # Deliberately NOT monitoring beta: it sits behind HTTP Basic auth and would
   # answer 401 to every check.
 
