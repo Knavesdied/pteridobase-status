@@ -59,18 +59,16 @@
     "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
     "slug": "zz-mail-path-test",
     "status": "up",
-    "uptime": "96.77%",
-    "uptimeDay": "96.77%",
-    "uptimeWeek": "96.77%",
-    "uptimeMonth": "96.77%",
-    "uptimeYear": "96.77%",
+    "uptime": "100.00%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
+    "uptimeYear": "100.00%",
     "time": 541,
     "timeDay": 541,
     "timeWeek": 541,
     "timeMonth": 541,
     "timeYear": 541,
-    "dailyMinutesDown": {
-      "2026-09-02": 2
-    }
+    "dailyMinutesDown": {}
   }
 ]
