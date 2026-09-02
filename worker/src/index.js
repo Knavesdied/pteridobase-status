@@ -43,9 +43,9 @@ const USER_AGENT = "pteridobase-uptime-dispatcher (+https://github.com/Knavesdie
  * older than the threshold, something between us and a running check is broken, and
  * that is worth an error even though our own POSTs are returning 204.
  */
-async function newestRunAgeMinutes(env, headers) {
+async function newestRunAgeMinutes(env, headers, workflow) {
 	const url = `https://api.github.com/repos/${env.GH_OWNER}/${env.GH_REPO}` +
-		`/actions/workflows/${env.GH_WORKFLOW}/runs?per_page=1`;
+		`/actions/workflows/${workflow}/runs?per_page=1`;
 	const res = await fetch(url, { headers });
 	if (!res.ok) {
 		// Not fatal: the staleness check is corroboration, not the job. Say so and carry
@@ -65,9 +65,66 @@ async function newestRunAgeMinutes(env, headers) {
 	return (Date.now() - created) / 60000;
 }
 
+/**
+ * A var may arrive as an object or as a JSON string depending on how it was set
+ * (wrangler.jsonc vs a dashboard secret), so normalise rather than assume.
+ */
+function asObject(v) {
+	if (!v) return {};
+	return (typeof v === "string") ? JSON.parse(v) : v;
+}
+
+/**
+ * WHICH WORKFLOW IS THIS TICK FOR?
+ *
+ * Cloudflare hands us the cron STRING that fired. `GH_SCHEDULE` maps a cron to a
+ * workflow directly, which is all that was needed while every job had its own trigger.
+ *
+ * It no longer does. Workers Free allows FIVE cron triggers PER ACCOUNT, shared with
+ * every other Worker on it, so the three hourly jobs share one multi-minute cron and
+ * the MINUTE selects between them. That is the whole reason for the second map, and
+ * it is a constraint rather than a preference — a four-trigger deploy was refused with
+ * the code already live and the triggers half-applied.
+ *
+ * An unmapped cron THROWS rather than returning quietly. A trigger added to
+ * wrangler.jsonc without a matching entry would otherwise fire forever doing nothing
+ * and report success every time — precisely the failure this Worker exists to end
+ * (#869: a monitor that logged "Sending notification" for weeks while its email
+ * channel did not exist). The same applies to a minute the map does not know.
+ */
+function resolveWorkflow(event, env) {
+	const schedule = asObject(env.GH_SCHEDULE);
+	const direct = schedule[event.cron];
+	if (direct) {
+		return direct;
+	}
+
+	if (env.GH_HOURLY_CRON && event.cron === env.GH_HOURLY_CRON) {
+		const byMinute = asObject(env.GH_HOURLY_BY_MINUTE);
+		// scheduledTime is the tick's own instant, so this cannot drift with execution
+		// delay the way reading a wall clock here would.
+		const minute = String(new Date(event.scheduledTime).getUTCMinutes());
+		const hourly = byMinute[minute];
+		if (hourly) {
+			return hourly;
+		}
+		throw new Error(
+			`hourly cron ${JSON.stringify(event.cron)} fired at minute ${minute}, ` +
+			`which maps to no workflow - GH_HOURLY_BY_MINUTE has ` +
+			`${JSON.stringify(Object.keys(byMinute))}`
+		);
+	}
+
+	throw new Error(
+		`no workflow mapped to cron ${JSON.stringify(event.cron)} - ` +
+		`GH_SCHEDULE has ${JSON.stringify(Object.keys(schedule))}` +
+		(env.GH_HOURLY_CRON ? ` and the hourly cron is ${JSON.stringify(env.GH_HOURLY_CRON)}` : "")
+	);
+}
+
 export default {
 	async scheduled(event, env, ctx) {
-		const missing = ["GH_OWNER", "GH_REPO", "GH_WORKFLOW", "GH_REF", "GH_TOKEN"]
+		const missing = ["GH_OWNER", "GH_REPO", "GH_SCHEDULE", "GH_REF", "GH_TOKEN"]
 			.filter((k) => !env[k]);
 		if (missing.length) {
 			// Throwing marks the invocation failed in Cloudflare's observability. A
@@ -76,6 +133,16 @@ export default {
 			throw new Error(`dispatcher misconfigured: missing ${missing.join(", ")}`);
 		}
 
+		// WHICH WORKFLOW IS THIS TICK FOR? Cloudflare hands us the cron STRING that
+		// fired, and GH_SCHEDULE maps it to a workflow filename.
+		//
+		// An unmapped cron THROWS rather than returning quietly. A trigger added to
+		// wrangler.jsonc without a matching schedule entry would otherwise fire forever
+		// doing nothing, reporting success every time - which is precisely the shape of
+		// failure this Worker was built to end (#869: a monitor that logged "Sending
+		// notification" for weeks while its email channel did not exist).
+		const workflow = resolveWorkflow(event, env);
+
 		const headers = {
 			"Accept": "application/vnd.github+json",
 			"X-GitHub-Api-Version": "2022-11-28",
@@ -83,17 +150,25 @@ export default {
 			"Authorization": `Bearer ${env.GH_TOKEN}`,
 		};
 
-		const staleAfter = Number(env.STALE_AFTER_MIN || 20);
-		const age = await newestRunAgeMinutes(env, headers);
-		if (age !== null && age > staleAfter) {
-			console.error(
-				`no ${env.GH_WORKFLOW} run for ${age.toFixed(1)} min (threshold ${staleAfter}) — ` +
-				`dispatches may be succeeding without producing runs`
-			);
+		// The staleness check is scoped to ONE workflow, the five-minute one. Applying a
+		// 20-minute threshold to an hourly job would report stale on almost every tick -
+		// a check that cries wolf is one people stop reading, which is the same lesson
+		// the alert thresholds in .upptimerc.yml are written to.
+		const staleTarget = env.GH_STALENESS_WORKFLOW || "";
+		let age = null;
+		if (workflow === staleTarget) {
+			const staleAfter = Number(env.STALE_AFTER_MIN || 20);
+			age = await newestRunAgeMinutes(env, headers, workflow);
+			if (age !== null && age > staleAfter) {
+				console.error(
+					`no ${workflow} run for ${age.toFixed(1)} min (threshold ${staleAfter}) — ` +
+					`dispatches may be succeeding without producing runs`
+				);
+			}
 		}
 
 		const url = `https://api.github.com/repos/${env.GH_OWNER}/${env.GH_REPO}` +
-			`/actions/workflows/${env.GH_WORKFLOW}/dispatches`;
+			`/actions/workflows/${workflow}/dispatches`;
 		const res = await fetch(url, {
 			method: "POST",
 			headers: { ...headers, "Content-Type": "application/json" },
@@ -112,8 +187,8 @@ export default {
 		}
 
 		console.log(
-			`dispatched ${env.GH_WORKFLOW}@${env.GH_REF} ` +
-			`(newest prior run ${age === null ? "unknown" : age.toFixed(1) + " min old"})`
+			`dispatched ${workflow}@${env.GH_REF} for cron ${JSON.stringify(event.cron)}` +
+			(age === null ? "" : ` (newest prior run ${age.toFixed(1)} min old)`)
 		);
 	},
 

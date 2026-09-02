@@ -14,27 +14,81 @@
 	// 2-3% of its firings (Pteridobase#869); Cloudflare's scheduler is what actually
 	// runs every five minutes.
 	//
-	// A measured caveat, so nobody chases it as a fault: all eight Upptime workflows
-	// share ONE concurrency group with cancel-in-progress false, and GitHub keeps only
-	// one PENDING run per group — surplus dispatches are discarded, not queued. Uptime
-	// CI completes in 14-15s so this is normally slack, but the daily workflows
-	// (00:00, 01:00, 03:00, 23:00 UTC) will eat a check when they collide.
+	// THE STAGGER IS LOAD-BEARING, NOT TIDINESS. All eight Upptime workflows share ONE
+	// concurrency group with cancel-in-progress false, and GitHub keeps only one PENDING
+	// run per group — a surplus dispatch is DISCARDED, not queued. uptime.yml occupies
+	// the group for 14-15s in every 300 (~5% duty cycle), so putting the three hourly
+	// jobs five minutes apart keeps them from colliding with EACH OTHER and gives each
+	// ~95% odds of finding the group free.
+	//
+	// WHY HOURLY RATHER THAN THE DAILY SCHEDULE THESE WORKFLOWS SHIP WITH. Not freshness
+	// for its own sake: an hourly cadence makes a discarded run STOP MATTERING. Lose one
+	// and the next attempt is 60 minutes away; lose a daily one and it is 24 hours, which
+	// is exactly how the status page came to be showing 11.7-hour-old figures on
+	// 2026-09-02 while production was serving in 0.22s.
+	//
+	// site.yml is deliberately NOT here. It rebuilds the Svelte shell only — the page
+	// fetches history/summary.json and the graphs PNGs from raw.githubusercontent at
+	// RUNTIME, so the data does not wait on a site build. Verified by reading the live
+	// DOM: the chart is a CSS background on article.graph::before pointing at
+	// graphs/<slug>/response-time-week.png, not a baked asset.
+	// TWO TRIGGERS, NOT FOUR, AND THE ACCOUNT LIMIT IS WHY. Workers Free allows five
+	// cron triggers PER ACCOUNT, shared with every other Worker on it — asking for
+	// four here was refused with the code deployed and the triggers only partially
+	// updated, which is a worse state than either outcome. Checked before designing,
+	// it would have been a one-line difference.
+	//
+	// The three hourly jobs therefore share ONE cron and the handler picks by minute.
+	// They sit at :07, :12, :17 — deliberately OFF the five-minute grid, because
+	// "5,10,15" would fire in the same minute as an uptime tick and the two dispatches
+	// would land in the same concurrency group, where the surplus one is DISCARDED.
+	// Off-grid minutes cost nothing and remove the collision entirely.
 	"triggers": {
-		"crons": ["*/5 * * * *"]
+		"crons": [
+			"*/5 * * * *",
+			"7,12,17 * * * *"
+		]
 	},
 
 	// Every one of these is a VAR, not a secret, and deliberately so: the repo path is
 	// the thing that changes when Pteridobase#865 moves this repo to an organisation,
 	// and a repoint should be a config edit plus a deploy, never a code change.
 	//
-	// GH_WORKFLOW is the workflow FILENAME, which is what the dispatches endpoint takes.
-	// GH_REF must be a branch that exists — a wrong one returns 422 rather than failing
+	// GH_SCHEDULE maps each cron trigger to the workflow FILENAME it should dispatch —
+	// the filename is what the dispatches endpoint takes, not the workflow's `name`.
+	// GH_REF must be a branch that exists: a wrong one returns 422 rather than failing
 	// silently, which is why workflow_dispatch was chosen over repository_dispatch.
+	//
+	// THE ORDER WITHIN THE HOUR IS DELIBERATE. response-time recomputes the figures,
+	// graphs redraws the PNGs the status page loads directly, summary writes the
+	// history/summary.json the page fetches at runtime. Running summary first would
+	// publish numbers computed from data the other two had not yet refreshed.
+	//
+	// Every key here must also appear in triggers.crons above, character for character:
+	// Cloudflare hands the handler the cron STRING that fired, and a mismatch means a
+	// tick with nothing to dispatch. The Worker treats that as an error rather than a
+	// no-op, because a scheduler that silently does nothing is the whole failure this
+	// project exists to correct.
 	"vars": {
 		"GH_OWNER": "Knavesdied",
 		"GH_REPO": "pteridobase-status",
-		"GH_WORKFLOW": "uptime.yml",
 		"GH_REF": "main",
+		// Keyed by cron for the five-minute tick, and by MINUTE for the shared hourly
+		// cron — Cloudflare hands the handler the cron string, so a multi-minute
+		// expression needs the minute to disambiguate which job this tick is.
+		"GH_SCHEDULE": {
+			"*/5 * * * *": "uptime.yml"
+		},
+		"GH_HOURLY_CRON": "7,12,17 * * * *",
+		"GH_HOURLY_BY_MINUTE": {
+			"7": "response-time.yml",
+			"12": "graphs.yml",
+			"17": "summary.yml"
+		},
+
+		// The staleness check applies to THIS workflow only. Running it against an
+		// hourly job with a 20-minute threshold would report stale on every tick.
+		"GH_STALENESS_WORKFLOW": "uptime.yml",
 
 		// Minutes. Above this with no run of GH_WORKFLOW, the Worker logs an error even
 		// though its own POSTs are returning 204 — the "succeeds but does nothing" case.
