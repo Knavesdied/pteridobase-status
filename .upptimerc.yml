@@ -175,7 +175,29 @@ status-website:
   # out rather than inlined at 25-38 kB each for a page nobody installs.
   customHeadHtml: |
     <link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAEpklEQVRYhe3XXWxTZRzH8W97Ttt1fV/Xdm3ZVvbSrt06xroNQQYMRiwGRCLohXil1yYmRu+IdxqiV8QrE73AC8VEMxNAQwKMQOJ4meFlAycbYzDW0W7d2rXbTl+OFyQ1yMABNYvG5+rk9895/p/8T56TPIpQm1FmBZdyJZv/D/hHAF1du1AoFCsHeGXXfvwNLSsHkOU8raGNxQG8tf9dSkv1j62Hw6+jUqkfykSVmrGxm8UBeH1B9r729pI1rVZHR8dmamv8D+Xx6Si5XK44gJ6ew+zd+86SU9BqdRj0ZnwNzYXM4/HidFahLSktDuDy5V8wGEyEX9r3SK2uLkBpqQ5QoFQ+2KauNoDN5mRVZU1xAJmMRH//OQKBtY/UrFY7+XyeLVt2UlZmA0Cl1pBKJbDbXQXUcwEABgYv4fF40emMhcxotLCuowtZztPXd5LFxUXgwT8AFJRoShAEsTgAf0MLq1atZsP6bQ/ll6/0IUkSPm8zG9Z3A3Du7M8YDCYqK2uxmMuLAzj+03ckk7MoBaGQ1dc30tQYwmarYGjoKkO/XwVAyiySy2VRCgL19Y3FAchynvn5NGaztZAJgshsIs78Qhq93ogkLRZyQRBRqzRYyysQRdXzA9xuD+l0krZQJ1qtDoCZmSni8SkykkQg0IrTWQnAyMgNxsaGiUzeJZ1OYjKVFfYJBtuXD3C5qgvPkchd9HojJlMZPt+DM59IzNAcbEevN3K69yharR6DwUw4vI/W1hcxGS0YDRaSyVkAOjeGqatb+pMsCejsDBeOViwa4c7dW9hsTrZ378FgMFNb60ejKUGt1uDzBtGWaPH5gsSiEe7fH2d0dAibzcnalvWoVGpCoY3cnxxfEiC4XJqP/hqWaLR8+MFnnDz5I9PTUaKxCLU1fqxWO4IostrjA2SMRgu5fI75+RT5XJ7t2/dQWVWHXm/gyJEvuHjpDJs37WBNywv0njlGPB5b3gSisQjz8ykOHPic1TU+nBWVJBJxGhpaWNO8jsHrv5LNZlmUFii3OnA5q2lr68Ra7iAycYfkXIJNm1+murqenTvfJBaNMDU1ufwJzM5OY7ZY8TesZdvW3ajUGu7du43X24TD4aapqZ1kMo7BYEYURVLpORobQ5hNVq4NXEShUKLVlrIj/AYjIzc4euwbxsdHlw8AiEYjBIPtuFzVqFVq7HY32ayETmdgYmKMWCzCwkKaXC7Ptq27MRktzM0lqK6qY+LeGC5XFWqVmuPHv+XChd4lmz8RIEkLzKWSWK12pIzEmuYORm/fpKqyFrfbQyDQilqtoampDVnOMzsbRykIJBJxpqYmmZwc5+NP3uPK1fOPbQ7w2B92JiNx/vwpRoav0939KtLiAg6Hm2RyBqu1AlnO43JVo1AoyGYzKJVKbt36jVQ6yeGvDzEwcOmJjf92AgCyLJNKJRkZuUE0NsHgYD9+fyvl5Q4ik+N8+dWniCoVbpeH071H6ek5TF/fKa5du7is5gCKp7kZiaKKQ4e+Z3R0iIMH30eWZXy+Zrq6dnHixA8MDw8uu/EzAQAaAyEGr/cjy3++JggiuVz2qZs/E6DY6793M/rXAf4AR7+aNjJ2FmkAAAAASUVORK5CYII=" />
-    <meta name="theme-color" content="#33340e" />
+    <!--
+      THEME-COLOR, MEDIA-SCOPED. Tints Safari's window chrome; changes no pixel
+      of the page itself.
+
+      WHY TWO. A single dark value made the chrome EXACTLY the icon's own ground:
+      measured, the icon is rgb(51,52,14) and #33340e IS rgb(51,52,14) - a
+      contrast ratio of 1.11:1. Safari then draws a light ring round the favicon
+      so it stays visible, which reads as an unwanted white border. Against a
+      light bar the same icon is 11.03:1 and needs no help. So dark mode keeps
+      the brand green and light mode gets a pale ground to separate from.
+
+      The white border was never in any file we serve - measured across every
+      size: zero light edge pixels, zero translucent pixels, hard corners.
+
+      UPPTIME EMITS ITS OWN theme-color #333333 FIRST and exposes no config key
+      to suppress it (status-website supports theme, themeUrl, name, logoUrl,
+      favicon, faviconSvg, customHeadHtml, customBodyHtml, customFootHtml - no
+      themeColor). Ours are appended and Safari honours the last match, which is
+      why the chrome renders olive rather than grey. Do not "tidy" these away
+      believing they are the redundant pair - upstream's is.
+    -->
+    <meta name="theme-color" content="#f0f0e7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#33340e" media="(prefers-color-scheme: dark)" />
     <script>
       /* ISO-STYLE UTC EVERYWHERE: "2026-09-01 19:55 UTC".
 
