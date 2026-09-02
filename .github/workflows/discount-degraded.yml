@@ -1,0 +1,98 @@
+# Degraded performance is not downtime.
+#
+# WHY THIS EXISTS. Upptime records two kinds of incident and treats them
+# identically when it computes uptime:
+#
+#     status === "down"  ->  "🛑 <name> is down"
+#     otherwise          ->  "⚠️ <name> has degraded performance"
+#         (uptime-monitor@v1.43.16, src/update.ts L648-651)
+#
+# A degraded incident here means the site answered HTTP 200 more slowly than
+# `maxResponseTime`. It was reachable the whole time. Booking those minutes as
+# downtime makes the uptime figure answer a question nobody asked - and it does
+# so misleadingly, because the page ALREADY reports the slowness separately, in
+# the average response time and in the charts. Counting it twice does not add
+# information; it just makes whichever monitor has the tighter threshold look
+# less reliable than the identical server behind a looser one.
+#
+# Owner's ruling, 2 September 2026: "The system was up. A performance
+# degradation of the nature we had was not downtime."
+#
+# HOW UPTIME IS ACTUALLY STORED, because this is not documented upstream and it
+# is not what anyone assumes. The uptime percentage is NOT derived from
+# history/*.yml. `getDowntimeSecondsForSite()` queries
+#
+#     octokit.issues.listForRepo({ labels: `status,${slug}`, state: "all" })
+#         (uptime-monitor@v1.43.16, src/helpers/calculate-uptime.ts L48-55)
+#
+# and builds downtime ranges from each issue's created_at -> closed_at. The YAML
+# supplies only `startTime`, the denominator. So the `status` LABEL is the
+# downtime storage backend, not a tag: removing it deletes that outage from
+# every window at once, and there is no second ledger to fall back on.
+#
+# That makes removing the label the only supported lever for discounting an
+# incident - and this workflow applies it to exactly one case, automatically, so
+# the distinction survives without anyone having to remember it.
+#
+# WHY ON `closed` AND NEVER ON `opened`. Upptime finds the OPEN incident to
+# close by the same label query:
+#
+#     labels: `status,${slug}`, state: "open", per_page: 1
+#         (src/update.ts L623-629)
+#
+# Strip the label while the issue is open and Upptime can no longer find it, so
+# it is never closed - the issue is stranded open forever and the next
+# degradation opens a duplicate. Acting on `closed` means Upptime has already
+# finished with the issue.
+#
+# WHY THE GATE IS POSITIVE. It fires only on a title containing "has degraded
+# performance". If upstream ever changes that wording, this workflow silently
+# does NOTHING - which leaves a degraded incident counted as downtime: visible,
+# reported, and correctable. The inverse gate ("not a down issue") would fail
+# the other way and strip the label from a REAL outage, erasing it with nothing
+# to show anything had happened. Fail toward doing nothing.
+#
+# SAFE FROM THE NIGHTLY TEMPLATE SYNC. `update-template.ts` removes eight
+# workflow files BY NAME - graphs, response-time, setup, site, summary,
+# update-template, updates, uptime - and rewrites those same eight. Its own
+# comment reads "Remove our workflows (not all workflows)". Any other filename
+# is untouched, so this file survives.
+
+name: Discount degraded incidents
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  issues: write
+
+jobs:
+  discount:
+    # Both conditions are required. The label test means a second `closed` event
+    # on an already-processed issue is a no-op rather than an error.
+    if: >-
+      contains(github.event.issue.labels.*.name, 'status') &&
+      contains(github.event.issue.title, 'has degraded performance')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Leave the reason on the issue, then remove the label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        # Each paragraph is a separate quoted argument to printf. Writing the
+        # body as one multi-line string inside this block scalar would carry the
+        # YAML indentation into the posted comment.
+        #
+        # No `|| true` anywhere: if this fails the run goes red and is
+        # diagnosable. A swallowed failure would look exactly like a
+        # correctly-discounted incident.
+        run: |
+          set -euo pipefail
+          BODY=$(printf '%s\n\n%s\n\n%s' \
+            'Removed the `status` label automatically: this was **degraded performance**, not downtime. The site answered HTTP 200 throughout, just more slowly than the configured `maxResponseTime`.' \
+            'Upptime derives its uptime percentage from issues carrying this label (`created_at` to `closed_at`), so leaving it would book slow-but-reachable minutes as outage. The slowness is still reported: it is in the average response time and in the charts.' \
+            'Down incidents (`is down`) keep their label and still count toward downtime. See `.github/workflows/discount-degraded.yml`.')
+          gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
+          gh issue edit "$NUMBER" --repo "$REPO" --remove-label status
