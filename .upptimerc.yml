@@ -59,10 +59,22 @@ sites:
     #                                    expected, see Pteridobase#614
     #   during the incident    4 – 47 s
     #
-    # 2000 ms sits comfortably above the known-benign spike and an order of
+    # 3000 ms sits comfortably above the known-benign spike and an order of
     # magnitude below the fault, so it should neither miss a real incident nor
     # cry wolf. A check people learn to ignore is worse than no check at all.
-    maxResponseTime: 2000
+    #
+    # RAISED 2000 -> 3000 (owner, 2 September 2026; applied 5 September). A
+    # threshold has to clear the noise floor of the INSTRUMENT as well as the
+    # baseline of the thing measured, and nobody had measured the instrument: a
+    # shared GitHub Actions runner on the public internet reads 642-1146 ms
+    # (n=15) against a site that is genuinely fast.
+    #
+    # The tell was that the three monitors ranked by their THRESHOLDS rather
+    # than by their subjects, on the same morning of the same incident:
+    # 2000 ms/94.39%, 1000 ms/93.60%, 3000 ms/100.00%. The API was never worse
+    # than the site; it was measured with a finer sieve. Still better than 2x
+    # margin on the 5.9 s+ fault class.
+    maxResponseTime: 3000
 
   - name: Exotic Fern Group
     url: https://www.exoticferngroup.org/
@@ -94,10 +106,24 @@ sites:
     __dangerous__body_degraded_if_text_missing: '"ok":true'
     #
     # Measured on production immediately after the v1.8.2 promotion, five
-    # samples: 0.188 - 0.273 s (it is one SELECT 1). 1000 ms is ~3.7x the slowest
-    # sample and an order of magnitude below the 4-47 s seen on 1 September, so it
-    # should neither miss a real incident nor cry wolf.
-    maxResponseTime: 1000
+    # samples: 0.188 - 0.273 s. An order of magnitude below the 4-47 s seen on
+    # 1 September, so it should neither miss a real incident nor cry wolf.
+    #
+    # RAISED 1000 -> 2000 (owner, 2 September 2026; applied 5 September). 1000 ms
+    # was inside the RUNNER's own noise floor - a shared GitHub Actions runner
+    # reads 642-1146 ms against this endpoint - so the monitor could report the
+    # API degraded on a wholly healthy platform, and did: it scored WORSE than the
+    # site it is a subset of, purely because it was sieved finer. See the site
+    # monitor above for the full reasoning; the rule is that a threshold must
+    # clear the noise floor of the instrument as well as the baseline of the
+    # thing measured.
+    #
+    # This comment used to say "(it is one SELECT 1)". That stopped being true at
+    # Pteridobase#874: the endpoint now runs a real indexed read, because
+    # SELECT 1 is answered from nothing and reported db_ms:0 straight through a
+    # live database outage. The timing above still holds - the read is
+    # sub-millisecond - but do not reason from the old query.
+    maxResponseTime: 2000
 
   # Deliberately NOT monitoring beta: it sits behind HTTP Basic auth and would
   # answer 401 to every check.
