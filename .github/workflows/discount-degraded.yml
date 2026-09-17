@@ -45,6 +45,30 @@
 # degradation opens a duplicate. Acting on `closed` means Upptime has already
 # finished with the issue.
 #
+# WHY IT UNLOCKS FIRST, AND LOCKS AGAIN AFTER. Upptime keeps every incident
+# issue locked, and the close is a four-step sequence:
+#
+#     unlock -> createComment -> update({ state: "closed" }) -> lock
+#         (src/update.ts L702-733)
+#
+# Our `closed` webhook fires on step three, but a hosted runner takes about four
+# seconds to reach the first command, and step four lands about one second after
+# the close. The issue is therefore ALWAYS locked again by the time we get
+# there, and `gh issue comment` fails with
+#
+#     GraphQL: Unable to create comment because issue is locked (addComment)
+#
+# which under `set -e` aborts the step BEFORE the label is removed - producing
+# exactly the outcome this workflow exists to prevent, on every real incident.
+# Runs 34009613674, 34009615934 and 35211875875 (issues #11, #12 and #13) all
+# died this way; the only green run, on 2 September, was against a hand-made
+# test issue that Upptime had never locked.
+#
+# So: unlock, do the work, lock again - leaving the issue in the state Upptime
+# expects to find it in. The re-lock is a trap rather than a final line so that
+# a failure part-way through cannot leave an incident issue open to comments; it
+# swallows nothing, and the step's exit status is unchanged.
+#
 # WHY THE GATE IS POSITIVE. It fires only on a title containing "has degraded
 # performance". If upstream ever changes that wording, this workflow silently
 # does NOTHING - which leaves a degraded incident counted as downtime: visible,
@@ -88,11 +112,18 @@ jobs:
         # No `|| true` anywhere: if this fails the run goes red and is
         # diagnosable. A swallowed failure would look exactly like a
         # correctly-discounted incident.
+        #
+        # `gh issue lock`/`unlock` are idempotent - against an issue that is
+        # already in the requested state they report "Nothing changed" and exit
+        # 0 (cli/cli@v2.99.0, pkg/cmd/issue/lock/lock.go L280-289) - so neither
+        # call depends on winning the race described above.
         run: |
           set -euo pipefail
           BODY=$(printf '%s\n\n%s\n\n%s' \
             'Removed the `status` label automatically: this was **degraded performance**, not downtime. The site answered HTTP 200 throughout, just more slowly than the configured `maxResponseTime`.' \
             'Upptime derives its uptime percentage from issues carrying this label (`created_at` to `closed_at`), so leaving it would book slow-but-reachable minutes as outage. The slowness is still reported: it is in the average response time and in the charts.' \
             'Down incidents (`is down`) keep their label and still count toward downtime. See `.github/workflows/discount-degraded.yml`.')
+          trap 'gh issue lock "$NUMBER" --repo "$REPO"' EXIT
+          gh issue unlock "$NUMBER" --repo "$REPO"
           gh issue comment "$NUMBER" --repo "$REPO" --body "$BODY"
           gh issue edit "$NUMBER" --repo "$REPO" --remove-label status
