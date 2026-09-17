@@ -301,11 +301,24 @@ status-website:
     </script>
 
   # THE HEADER AND THE FOOTER ARE BOTH HERE, and the footer's placement is the
-  # reason. `customFootHtml` exists in @upptime/status-page's current source but
-  # is NOT emitted by the version uptime-monitor v1.43.16 pins - verified by
-  # grepping the served HTML, where the only `pb-footer` string was the one in
-  # our own CSS. A key that silently does nothing is worse than no key, so it is
-  # removed rather than left looking configured.
+  # reason. `customFootHtml` exists in @upptime/status-page's master source but
+  # has never been released: the published layout handles `customHeadHtml` and
+  # `customBodyHtml` and nothing else - verified by unpacking the npm tarball,
+  # where the string does not occur at all.
+  #
+  # IT IS NOT GATED ON OUR UPPTIME VERSION, which is the part worth knowing. The
+  # site build installs the package unpinned -
+  #
+  #     npm i @upptime/status-page
+  #         (uptime-monitor@v1.44.0, src/site.ts L13 and L36)
+  #
+  # - so every daily build takes whatever npm calls `latest`: 1.17.0, published
+  # June 2024 and untouched since. No uptime-monitor bump can turn this key on;
+  # equally, the day status-page releases its master layout, the build picks it
+  # up on its own with nothing changed here.
+  #
+  # A key that silently does nothing is worse than no key, so it is removed
+  # rather than left looking configured.
   #
   # Both blocks are therefore injected at the TOP of #sapper, and CSS `order`
   # puts the footer last (see the flex rules below). Ordering in CSS rather than
