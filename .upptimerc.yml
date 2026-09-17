@@ -232,11 +232,15 @@ status-website:
       size: zero light edge pixels, zero translucent pixels, hard corners.
 
       UPPTIME EMITS ITS OWN theme-color #333333 FIRST and exposes no config key
-      to suppress it (status-website supports theme, themeUrl, name, logoUrl,
+      to suppress it (status-website DOCUMENTS theme, themeUrl, name, logoUrl,
       favicon, faviconSvg, customHeadHtml, customBodyHtml, customFootHtml - no
-      themeColor). Ours are appended and Safari honours the last match, which is
-      why the chrome renders olive rather than grey. Do not "tidy" these away
-      believing they are the redundant pair - upstream's is.
+      themeColor). That list is the documented schema, not what the build
+      honours: customFootHtml is absent from the released status-page package
+      and does nothing, which is why the footer is carried in customBodyHtml
+      instead - see the note there. Ours are appended and Safari honours the
+      last match, which is why the chrome renders olive rather than grey. Do
+      not "tidy" these away believing they are the redundant pair - upstream's
+      is.
     -->
     <meta name="theme-color" content="#f0f0e7" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#33340e" media="(prefers-color-scheme: dark)" />
