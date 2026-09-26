@@ -1,0 +1,100 @@
+# Pteridobase site banner: push the monitor's verdict onto the site.
+#
+# WHY THIS EXISTS. Every incident this monitor has recorded was "degraded at
+# HTTP 200": pteridobase.org answered, slowly, and a visitor could not tell
+# whether it was them. Upptime knows within five minutes and writes it here as
+# an issue; this workflow forwards the issue's open and close to the site, which
+# renders a one-line banner from it and clears it on close. The site never
+# fetches from GitHub on a page view and stores nothing in the visitor's
+# browser (Knavesdied/Pteridobase#925; design rulings DR16 and DR17 there).
+#
+# WHAT IT SENDS. `github.event.action` plus the issue's number, title, label
+# names, URL, created_at and body, as JSON, with a token in a header. THE SITE
+# DECIDES what the issue means, from Upptime's exact titles ("is down", "has
+# degraded performance") or the `maintenance` label, and ignores anything else.
+# So the predicate below only has to be cheap, not exact: a human issue that
+# happens to carry a monitor's label reaches the site and is ignored there.
+#
+# WHY THE PREDICATE IS ON THE SLUG LABELS AND NEVER ON `status`. `status` is
+# Upptime's downtime ledger and is carried by every monitor's incidents,
+# including Exotic Fern Group's; an EFG outage must not banner Pteridobase. The
+# slug labels name the monitor. `maintenance` is Upptime's own suppression
+# label (and the template's), so one issue both silences the monitor and posts
+# the banner. The discount workflow strips `status` from closed degraded
+# issues, which is a second reason not to key on it. Both directions are pinned
+# by scripts/test-banner-predicate.js, which reads this file rather than
+# restating the expression.
+#
+# `closed` FIRES BEFORE UPPTIME'S DELETION. Upptime deletes an issue closed
+# within 15 minutes that has one comment; the `closed` event has already
+# fired by then, so the clear always arrives. This workflow never touches the
+# issue itself (no comment, no label), so its lock is irrelevant here, and it
+# runs beside discount-degraded.yml on the same `closed` event without
+# ordering between them mattering.
+#
+# TWO TRAPS, RECORDED. (1) `issues` events create workflow runs only because
+# Upptime authors issues with GH_PAT, a user token. If that secret were ever
+# removed and Upptime fell back to GITHUB_TOKEN, GitHub would create NO runs
+# for the events it causes and the banner would stop SILENTLY. The site's
+# admin Environment page shows the last ping it received; a monitor-recorded
+# incident with no ping there is how that is seen. (2) The Cloudflare Worker
+# that drives the checks never sees a check result; it is not a source.
+#
+# A FAILED PING IS A RED RUN. curl retries three times with a delay, and if
+# every attempt fails the step fails and the run shows red under Actions. No
+# `|| true` anywhere: a swallowed failure would look exactly like a delivered
+# ping. A missing secret fails the same way, with its own message.
+#
+# SAFE FROM THE NIGHTLY TEMPLATE SYNC: update-template.ts removes and
+# rewrites eight workflow files BY NAME. This is a ninth, untouched.
+
+name: Pteridobase site banner
+
+on:
+  issues:
+    types: [opened, closed]
+
+# No GitHub API call is made, so the job needs no token permissions at all.
+permissions: {}
+
+jobs:
+  ping:
+    if: >-
+      contains(github.event.issue.labels.*.name, 'pteridobase') ||
+      contains(github.event.issue.labels.*.name, 'pteridobase-api') ||
+      contains(github.event.issue.labels.*.name, 'maintenance')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post the issue's open or close to pteridobase.org
+        env:
+          TOKEN: ${{ secrets.PTERIDOBASE_STATUS_HOOK_TOKEN }}
+          ACTION: ${{ github.event.action }}
+          # The whole issue object, as JSON, through the ENVIRONMENT: never
+          # interpolated into the script, so a title or body carrying shell
+          # metacharacters (this is a public repo) is data and nothing else.
+          ISSUE: ${{ toJSON(github.event.issue) }}
+        run: |
+          set -euo pipefail
+          if [ -z "$TOKEN" ]; then
+            echo "PTERIDOBASE_STATUS_HOOK_TOKEN is not set in this repository's secrets." >&2
+            exit 1
+          fi
+          # Built from the event, not from the title alone: the site derives the
+          # kind from title + labels and a maintenance window from the body's
+          # start:/end: lines. `body // ""` because an empty issue's body is null.
+          PAYLOAD=$(jq -cn --arg action "$ACTION" --argjson issue "$ISSUE" '{
+            action: $action,
+            number: $issue.number,
+            title: $issue.title,
+            labels: [ $issue.labels[].name ],
+            html_url: $issue.html_url,
+            created_at: $issue.created_at,
+            body: ($issue.body // "")
+          }')
+          curl --silent --show-error --fail-with-body \
+            --max-time 20 --retry 3 --retry-delay 5 --retry-all-errors \
+            -H "Content-Type: application/json" \
+            -H "X-Pteridobase-Status-Token: $TOKEN" \
+            --data "$PAYLOAD" \
+            https://pteridobase.org/wp-json/pteridobase/v1/status-hook
+          echo

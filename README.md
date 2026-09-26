@@ -55,6 +55,16 @@ throughout, so a plain up/down check would have missed it entirely.
 the incident ran 4–47 s — at a threshold that clears the known-benign spikes and
 still catches a real fault by an order of magnitude.
 
+**Its verdict reaches the site.** Every incident so far was _degraded at
+HTTP 200_: the site answered, slowly, and a visitor could not tell whether it
+was them. So [`pteridobase-banner.yml`](./.github/workflows/pteridobase-banner.yml)
+forwards each incident issue's open and close to pteridobase.org, which renders
+a one-line banner in its header and clears it on close. An issue labelled
+`maintenance` (the _Maintenance Event_ template) does the same for a planned
+window, and silences the monitor for it as Upptime always did. The site never
+fetches from GitHub on a page view. The workflow's label predicate is pinned by
+[`scripts/test-banner-predicate.js`](./scripts/test-banner-predicate.js).
+
 ## Configuration
 
 Everything lives in [`.upptimerc.yml`](./.upptimerc.yml), commented with the
