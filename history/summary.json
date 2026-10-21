@@ -4,19 +4,19 @@
     "url": "https://pteridobase.org/",
     "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
     "slug": "pteridobase",
-    "status": "degraded",
-    "uptime": "100.00%",
-    "uptimeDay": "99.90%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "100.00%",
-    "uptimeYear": "100.00%",
-    "time": 979,
-    "timeDay": 1471,
-    "timeWeek": 967,
-    "timeMonth": 955,
-    "timeYear": 979,
+    "status": "up",
+    "uptime": "99.99%",
+    "uptimeDay": "99.68%",
+    "uptimeWeek": "99.95%",
+    "uptimeMonth": "99.99%",
+    "uptimeYear": "99.99%",
+    "time": 981,
+    "timeDay": 1510,
+    "timeWeek": 976,
+    "timeMonth": 958,
+    "timeYear": 981,
     "dailyMinutesDown": {
-      "2026-10-21": 1
+      "2026-10-21": 5
     }
   },
   {
