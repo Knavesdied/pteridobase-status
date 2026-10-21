@@ -5,19 +5,17 @@
     "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
     "slug": "pteridobase",
     "status": "up",
-    "uptime": "99.99%",
-    "uptimeDay": "99.68%",
-    "uptimeWeek": "99.95%",
-    "uptimeMonth": "99.99%",
-    "uptimeYear": "99.99%",
-    "time": 1069,
-    "timeDay": 3377,
-    "timeWeek": 1523,
-    "timeMonth": 1101,
-    "timeYear": 1069,
-    "dailyMinutesDown": {
-      "2026-10-21": 5
-    }
+    "uptime": "100.00%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
+    "uptimeYear": "100.00%",
+    "time": 1070,
+    "timeDay": 3395,
+    "timeWeek": 1530,
+    "timeMonth": 1102,
+    "timeYear": 1070,
+    "dailyMinutesDown": {}
   },
   {
     "name": "Exotic Fern Group",
@@ -31,9 +29,9 @@
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 347,
-    "timeDay": 333,
-    "timeWeek": 336,
-    "timeMonth": 340,
+    "timeDay": 341,
+    "timeWeek": 337,
+    "timeMonth": 341,
     "timeYear": 347,
     "dailyMinutesDown": {}
   },
@@ -43,18 +41,16 @@
     "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
     "slug": "pteridobase-api",
     "status": "up",
-    "uptime": "99.96%",
-    "uptimeDay": "97.97%",
-    "uptimeWeek": "99.71%",
-    "uptimeMonth": "99.93%",
-    "uptimeYear": "99.96%",
-    "time": 629,
-    "timeDay": 2666,
-    "timeWeek": 1113,
-    "timeMonth": 678,
-    "timeYear": 629,
-    "dailyMinutesDown": {
-      "2026-10-21": 29
-    }
+    "uptime": "100.00%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
+    "uptimeYear": "100.00%",
+    "time": 630,
+    "timeDay": 2679,
+    "timeWeek": 1117,
+    "timeMonth": 679,
+    "timeYear": 630,
+    "dailyMinutesDown": {}
   }
 ]
