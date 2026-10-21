@@ -6,8 +6,8 @@
     "slug": "pteridobase",
     "status": "degraded",
     "uptime": "100.00%",
-    "uptimeDay": "100.00%",
-    "uptimeWeek": "100.00%",
+    "uptimeDay": "99.90%",
+    "uptimeWeek": "99.99%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 979,
@@ -15,7 +15,9 @@
     "timeWeek": 967,
     "timeMonth": 955,
     "timeYear": 979,
-    "dailyMinutesDown": {}
+    "dailyMinutesDown": {
+      "2026-10-21": 1
+    }
   },
   {
     "name": "Exotic Fern Group",
