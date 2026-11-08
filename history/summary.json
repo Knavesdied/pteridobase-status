@@ -6,8 +6,8 @@
     "slug": "pteridobase",
     "status": "degraded",
     "uptime": "100.00%",
-    "uptimeDay": "99.99%",
-    "uptimeWeek": "100.00%",
+    "uptimeDay": "99.90%",
+    "uptimeWeek": "99.99%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 1137,
@@ -16,7 +16,7 @@
     "timeMonth": 1294,
     "timeYear": 1137,
     "dailyMinutesDown": {
-      "2026-11-08": 0
+      "2026-11-08": 1
     }
   },
   {
