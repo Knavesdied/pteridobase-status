@@ -40,19 +40,19 @@
     "url": "https://pteridobase.org/api/v1/health",
     "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
     "slug": "pteridobase-api",
-    "status": "degraded",
+    "status": "up",
     "uptime": "100.00%",
-    "uptimeDay": "99.98%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
+    "uptimeDay": "99.83%",
+    "uptimeWeek": "99.98%",
+    "uptimeMonth": "99.99%",
     "uptimeYear": "100.00%",
     "time": 678,
-    "timeDay": 2550,
-    "timeWeek": 1061,
-    "timeMonth": 825,
+    "timeDay": 2512,
+    "timeWeek": 1058,
+    "timeMonth": 824,
     "timeYear": 678,
     "dailyMinutesDown": {
-      "2026-11-08": 0
+      "2026-11-08": 2
     }
   }
 ]
