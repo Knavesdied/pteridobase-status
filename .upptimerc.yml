@@ -606,11 +606,20 @@ assignees:
 # would sit here looking configured while nothing sends. Verified by reading
 # .github/workflows/uptime.yml rather than from the documentation.
 #
-# The credential is the owner's to create and never Claude's to handle. The
-# intended channel is SMTP via Resend, already a Pteridobase sub-processor for
-# transactional mail, so it adds no new company to the privacy posture.
+# EMAIL ALERTS ARE SWITCHED OFF (owner, 8 November 2026, Knavesdied/Pteridobase#1256).
+# Every NOTIFICATION_EMAIL_* secret was deleted. They sent through Resend with the
+# site's own API key, from the site's sending domain, inside the same 100-a-day
+# allowance as the site's sign-in emails. On 8 November 2026 the alerts alone sent
+# 76 emails to help@pteridobase.org in six hours of flapping between "degraded" and
+# "improved", which put the allowance, and with it every sign-in link, at risk.
+# Down alerts come from UptimeRobot instead (its own email, SMS, voice and push).
+# Slowness still shows on this status page, in the site's banner
+# (pteridobase-banner.yml) and in the issues assigned above; nothing emails it.
 #
-# Set these as repository secrets (Settings -> Secrets and variables -> Actions):
+# If email is ever turned back on, the credential is the owner's to create and
+# never Claude's to handle, and it must NOT be the site's Resend key, domain or
+# allowance (#1256). These are the repository secrets it took, with what each
+# one taught us (Settings -> Secrets and variables -> Actions):
 #
 #   NOTIFICATION_EMAIL_SMTP        true
 #        ^^ REQUIRED, AND THE WHOLE CHANNEL HANGS OFF IT. notifme.ts builds
@@ -626,7 +635,7 @@ assignees:
 #        are legal; any other value THROWS at `new NotifmeSdk()`, which runs at
 #        module top level outside any try/catch, so it fails the entire job rather
 #        than just email. Irrelevant with a single provider -- but it must parse.
-#   NOTIFICATION_EMAIL_SMTP_HOST   smtp.resend.com
+#   NOTIFICATION_EMAIL_SMTP_HOST   smtp.resend.com (until 8 November 2026)
 #   NOTIFICATION_EMAIL_SMTP_PORT   587
 #        ^^ 587 = STARTTLS, which is what nodemailer does by default (it only
 #        auto-enables implicit TLS on 465). Do not "fix" this to 465 without also
