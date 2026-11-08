@@ -4,19 +4,19 @@
     "url": "https://pteridobase.org/",
     "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
     "slug": "pteridobase",
-    "status": "degraded",
+    "status": "up",
     "uptime": "100.00%",
-    "uptimeDay": "99.95%",
-    "uptimeWeek": "99.99%",
-    "uptimeMonth": "100.00%",
+    "uptimeDay": "99.72%",
+    "uptimeWeek": "99.96%",
+    "uptimeMonth": "99.99%",
     "uptimeYear": "100.00%",
-    "time": 1165,
-    "timeDay": 3901,
-    "timeWeek": 1860,
+    "time": 1166,
+    "timeDay": 3871,
+    "timeWeek": 1859,
     "timeMonth": 1352,
-    "timeYear": 1165,
+    "timeYear": 1166,
     "dailyMinutesDown": {
-      "2026-11-08": 1
+      "2026-11-08": 4
     }
   },
   {
@@ -42,19 +42,19 @@
     "url": "https://pteridobase.org/api/v1/health",
     "icon": "https://icons.duckduckgo.com/ip3/pteridobase.org.ico",
     "slug": "pteridobase-api",
-    "status": "degraded",
+    "status": "up",
     "uptime": "100.00%",
-    "uptimeDay": "99.98%",
-    "uptimeWeek": "100.00%",
-    "uptimeMonth": "100.00%",
+    "uptimeDay": "99.76%",
+    "uptimeWeek": "99.97%",
+    "uptimeMonth": "99.99%",
     "uptimeYear": "100.00%",
     "time": 679,
-    "timeDay": 2512,
-    "timeWeek": 1066,
-    "timeMonth": 826,
+    "timeDay": 2493,
+    "timeWeek": 1067,
+    "timeMonth": 827,
     "timeYear": 679,
     "dailyMinutesDown": {
-      "2026-11-08": 0
+      "2026-11-08": 3
     }
   }
 ]
