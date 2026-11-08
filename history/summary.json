@@ -6,18 +6,16 @@
     "slug": "pteridobase",
     "status": "up",
     "uptime": "100.00%",
-    "uptimeDay": "99.70%",
-    "uptimeWeek": "99.96%",
-    "uptimeMonth": "99.99%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 1162,
-    "timeDay": 3896,
-    "timeWeek": 1840,
-    "timeMonth": 1346,
+    "timeDay": 3850,
+    "timeWeek": 1835,
+    "timeMonth": 1345,
     "timeYear": 1162,
-    "dailyMinutesDown": {
-      "2026-11-08": 4
-    }
+    "dailyMinutesDown": {}
   },
   {
     "name": "Exotic Fern Group",
@@ -31,8 +29,8 @@
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 337,
-    "timeDay": 242,
-    "timeWeek": 292,
+    "timeDay": 237,
+    "timeWeek": 291,
     "timeMonth": 325,
     "timeYear": 337,
     "dailyMinutesDown": {}
@@ -44,17 +42,15 @@
     "slug": "pteridobase-api",
     "status": "up",
     "uptime": "100.00%",
-    "uptimeDay": "99.74%",
-    "uptimeWeek": "99.96%",
-    "uptimeMonth": "99.99%",
+    "uptimeDay": "100.00%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 674,
-    "timeDay": 2461,
-    "timeWeek": 1031,
+    "timeDay": 2423,
+    "timeWeek": 1028,
     "timeMonth": 817,
     "timeYear": 674,
-    "dailyMinutesDown": {
-      "2026-11-08": 4
-    }
+    "dailyMinutesDown": {}
   }
 ]
