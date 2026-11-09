@@ -1,7 +1,7 @@
 url: https://pteridobase.org/api/v1/health
-status: up
+status: degraded
 code: 200
-responseTime: 828
-lastUpdated: 2026-11-09T05:07:47.428Z
+responseTime: 10644
+lastUpdated: 2026-11-09T06:09:14.376Z
 startTime: 2026-09-01T22:17:32.207Z
 generator: Upptime <https://github.com/upptime/upptime>
