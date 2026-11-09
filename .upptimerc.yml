@@ -329,23 +329,40 @@ status-website:
   # puts the footer last (see the flex rules below). Ordering in CSS rather than
   # in the DOM also means this keeps working if the injection point moves.
   #
-  # The site header. Deliberately WITHOUT the hamburger toggle that
-  # site-header.php carries: that exists because the real nav has five or more
-  # links, and with two they fit at every width. A non-functioning toggle would
-  # be worse than none, since this page ships no JS of its own.
+  # The site header, as site-header.php draws it since #1207 (option H): one
+  # markup, three lockups chosen by width, and the words not shown at a width
+  # are display:none, so a screen reader hears what is on screen. The logomark
+  # is the link's picture, so it has no name of its own and the words name the
+  # link, as on the site.
+  #
+  # THE MENU BUTTON IS A <details>, NOT THE SITE'S SCRIPTED BUTTON. The brand
+  # puts the links behind a menu button below 1024px. The site's button is
+  # driven by homepage.js; this page has no script of its own to drive one, and
+  # a <details> disclosure opens and closes with no script at all, is a button
+  # to assistive technology, and reports its own expanded state. Two copies of
+  # the links: the bar's (shown from 1024px) and the panel's (below it). The one
+  # not shown is display:none, so only one is ever heard.
   customBodyHtml: |
     <header class="pb-navbar" role="banner">
       <a class="pb-logo-wrap" href="https://pteridobase.org/" rel="home">
-        <span class="pb-logo-img" role="img" aria-label="Exotic Fern Group logo"></span>
+        <span class="pb-logo-img" aria-hidden="true"></span>
         <span class="pb-logo-textblock">
-          <span class="pb-logo-text">Pteridobase: An EFG Resource</span>
-          <span class="pb-logo-sub">The conservation and data platform of the Exotic Fern Group</span>
+          <span class="pb-logo-text">Pteridobase<span class="pb-logo-tail">: An EFG Resource</span></span>
+          <span class="pb-logo-sub pb-logo-sub--short">An EFG Resource</span>
+          <span class="pb-logo-sub pb-logo-sub--full">The conservation and data platform of the Exotic Fern Group</span>
         </span>
       </a>
       <nav class="pb-nav-links" aria-label="Primary navigation">
         <a href="https://pteridobase.org/">Pteridobase</a>
         <a href="https://www.exoticferngroup.org/">Exotic Fern Group</a>
       </nav>
+      <details class="pb-nav-menu">
+        <summary class="pb-nav-toggle" aria-label="Toggle navigation menu"><span class="pb-nav-toggle__bar"></span><span class="pb-nav-toggle__bar"></span><span class="pb-nav-toggle__bar"></span></summary>
+        <nav class="pb-nav-panel" aria-label="Primary navigation">
+          <a href="https://pteridobase.org/">Pteridobase</a>
+          <a href="https://www.exoticferngroup.org/">Exotic Fern Group</a>
+        </nav>
+      </details>
     </header>
 
     <footer class="pb-footer" role="contentinfo">
@@ -446,7 +463,7 @@ status-website:
        Measured, not guessed: every <a> reports text-decoration: none, so the
        line was never an underline at all. Reset explicitly rather than trusting
        our own rules to beat a selector we do not control. */
-    .pb-nav-links, .pb-footer__nav { background: transparent; border: 0; }
+    .pb-nav-links, .pb-nav-panel, .pb-footer__nav { background: transparent; border: 0; }
 
     body {
       font-family: var(--pb-font-serif);
@@ -506,38 +523,85 @@ status-website:
        `body.pb-search-page .pb-navbar` makes on the site itself.
        sticky rather than the site's `fixed`, because fixed needs a matching
        body padding-top that the site computes in JS and this page has none. */
+    /* Option H, as the site's homepage.css draws it (#1207): below 768px the
+       name lockup at a 32px logomark (bar 52px); from 768px the short lockup at
+       64px (bar 84px); from 1280px the full lockup. Half a logomark clear at
+       the bar's left edge and before the links or menu button; the bar keeps
+       its own 10px above and below. The words are moved down by the site's
+       measured shift so the fern is centred on them. */
     .pb-navbar {
+      --pb-logomark: 32px;
+      --pb-logo-text-shift: 6.5px;
+      --pb-navbar-pad-left: max(24px, calc(var(--pb-logomark) / 2));
       background: var(--efg-camouflage);
       color: #ffffff;
-      padding: 10px 24px;
+      padding: 10px 24px 10px var(--pb-navbar-pad-left);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: calc(var(--pb-logomark) / 2);
       position: sticky;
       top: 0;
       z-index: 10;
+      font-family: var(--pb-font-sans);
     }
-    .pb-logo-wrap { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .pb-logo-wrap {
+      display: flex; align-items: flex-start; flex: none;
+      gap: calc(var(--pb-logomark) * 0.22);
+      text-decoration: none; color: inherit;
+    }
     /* A background-image, not an <img>: Sapper crawls HTML src/href and would
        export this path as a 404 ROUTE, creating a directory that then collides
        with the real file. CSS url() is not crawled - the fonts below prove it,
        they survived the build that this broke. */
     .pb-logo-img {
-      width: 38px; height: 38px; flex-shrink: 0; display: block;
+      width: var(--pb-logomark); height: var(--pb-logomark); flex-shrink: 0; display: block;
       background: url('/efg-logomark-white.svg') no-repeat center / contain;
     }
-    .pb-logo-textblock { display: flex; flex-direction: column; line-height: 1.2; }
-    .pb-logo-text { font-family: var(--pb-font-sans); font-weight: 700; font-size: 13px; color: #ffffff; }
-    .pb-logo-sub  { display: none; font-family: var(--pb-font-sans); font-size: 9px; font-weight: 300; color: rgba(255,255,255,0.75); }
-    /* 11px / 18px gap, MEASURED off pteridobase.org/help/ rather than copied from
-       the stylesheet: homepage.css's `.pb-nav-links { font-size: 14px }` is the
-       MOBILE dropdown-panel rule, and a tablet+ media query overrides it to 11px
-       for the horizontal bar. Reading the first matching rule gave the wrong
-       number; the rendered page gave the right one. */
-    .pb-nav-links { display: flex; flex-direction: row; gap: 18px; font-family: var(--pb-font-sans); font-size: 11px; }
-    .pb-nav-links a { color: rgba(255,255,255,0.85); text-decoration: none; }
-    .pb-nav-links a:hover, .pb-nav-links a:focus { color: #ffffff; text-decoration: underline; }
+    .pb-logo-textblock {
+      display: flex; flex-direction: column; white-space: nowrap;
+      margin-top: var(--pb-logo-text-shift); color: #ffffff;
+    }
+    .pb-logo-text { font-weight: 700; font-size: calc(var(--pb-logomark) * 2 / 3); line-height: 1; }
+    .pb-logo-tail, .pb-logo-sub { display: none; }
+    .pb-logo-sub { font-size: 14px; font-weight: 300; line-height: 1.25; }
+
+    /* The links: 14px 300 in text-muted on the dark bar, 18px apart, from
+       1024px. Below that they sit in the menu's panel. */
+    .pb-nav-links { display: none; flex-direction: row; align-items: center; gap: 18px; font-size: 14px; }
+    .pb-nav-links a, .pb-nav-panel a { color: var(--pb-text-muted-dark); font-weight: 300; text-decoration: none; }
+    .pb-nav-links a:hover, .pb-nav-links a:focus,
+    .pb-nav-panel a:hover, .pb-nav-panel a:focus { color: #ffffff; text-decoration: underline; }
+
+    /* The menu button: the site's three 22px bars in a 44px target, turning to
+       an X when open. The -6px margin keeps the 32px footprint the header was
+       measured with, as on the site. */
+    .pb-nav-menu { flex-shrink: 0; }
+    .pb-nav-toggle {
+      display: flex; flex-direction: column; justify-content: center; gap: 5px;
+      width: 44px; height: 44px; margin: -6px; padding: 0;
+      cursor: pointer; list-style: none;
+    }
+    .pb-nav-toggle::-webkit-details-marker { display: none; }
+    .pb-nav-toggle::marker { content: ''; }
+    .pb-nav-toggle__bar {
+      display: block; width: 22px; height: 2px; margin: 0 auto;
+      background: #ffffff; border-radius: 1px;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    .pb-nav-menu[open] .pb-nav-toggle__bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .pb-nav-menu[open] .pb-nav-toggle__bar:nth-child(2) { opacity: 0; }
+    .pb-nav-menu[open] .pb-nav-toggle__bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    @media (prefers-reduced-motion: reduce) { .pb-nav-toggle__bar { transition: none; } }
+    /* The open panel: the links at 14px under the bar, lined up under the
+       logomark. Solid Camouflage, so bar and panel read as one surface. */
+    .pb-nav-panel {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 2;
+      padding: 16px 24px 20px var(--pb-navbar-pad-left);
+      background: var(--efg-camouflage);
+      font-size: 14px;
+    }
 
     /* The 24h / 7d / 30d / 1y / all period controls. They are <label>s tied to
        radio inputs and inherit the body serif, which left them the only UI
@@ -624,14 +688,25 @@ status-website:
 
     @media (min-width: 768px) {
       :root { --pb-gutter: 32px; }
-      .pb-logo-sub { display: block; }
+      .pb-navbar { --pb-logomark: 64px; --pb-logo-text-shift: 13.5px; }
+      .pb-logo-text { font-size: 20px; line-height: 1.12; }
+      .pb-logo-sub--short { display: block; }
       .pb-footer__inner { padding: 14px 32px; flex-direction: row; justify-content: space-between; align-items: center; gap: 32px; }
       #sapper > main { padding-top: 48px; padding-bottom: 64px; }
       main h1 { font-size: 40px; }
     }
     @media (min-width: 1024px) {
       :root { --pb-gutter: 48px; }
+      .pb-nav-links { display: flex; }
+      .pb-nav-menu { display: none; }
       .pb-footer__inner { padding: 14px 48px; }
+    }
+    /* The full lockup is the header's alone at 1280px; the rest of the page
+       keeps 768px and 1024px. */
+    @media (min-width: 1280px) {
+      .pb-logo-tail { display: inline; }
+      .pb-logo-sub--short { display: none; }
+      .pb-logo-sub--full { display: block; }
     }
 
   navbar:
