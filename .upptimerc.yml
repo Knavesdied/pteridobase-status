@@ -380,9 +380,16 @@ status-website:
       })();
     </script>
     <script>
-      /* Three things Upptime's templates fix in place, where no setting
-         reaches. If this never runs, each keeps Upptime's own text or tone and
+      /* What Upptime's templates fix in place, where no setting reaches. If
+         this never runs, each keeps Upptime's own order, text or tone and
          nothing else changes.
+         - Our footer arrives at the TOP of #sapper with our header: Upptime
+           injects customBodyHtml there, and has no released way to put markup
+           after <main>. The CSS `order` makes it look last, but keyboard focus
+           follows the page's code, so Tab reached the footer before the
+           status. It moves to the end of #sapper here. Svelte rebuilds both
+           blocks when the page starts, which is why this watches rather than
+           moving once; once the footer is last it does nothing.
          - A ✅ before the all-clear line: the brand never uses an emoji as an
            icon, so it comes off, and the page's CSS draws the set's tick.
          - A slow site's history page reads "Down": the template knows only up
@@ -393,6 +400,9 @@ status-website:
            on it (the lists strip them; this page does not), so it comes off. */
       (function () {
         function tidy() {
+          var root = document.getElementById('sapper');
+          var foot = root && root.querySelector(':scope > .pb-footer');
+          if (foot && root.lastElementChild !== foot) root.appendChild(foot);
           var line = document.querySelector('main > article.up');
           var first = line && line.firstChild;
           if (first && first.nodeType === 3 && /^\s*✅/.test(first.nodeValue)) {
@@ -589,9 +599,11 @@ status-website:
       margin: 0;
       padding-bottom: 0;
     }
-    /* Both injected blocks arrive at the top of #sapper, so ORDER - not DOM
-       position - puts the footer last. flex:1 on main also pins the footer to
-       the bottom of short pages instead of leaving it floating mid-screen. */
+    /* Both injected blocks arrive at the top of #sapper. The script in
+       customHeadHtml moves the footer to the end, so keyboard focus reaches it
+       last; ORDER here is the fallback that still puts it last on screen if
+       that script never runs. flex:1 on main also pins the footer to the
+       bottom of short pages instead of leaving it floating mid-screen. */
     #sapper { display: flex; flex-direction: column; min-height: 100vh; }
     .pb-navbar { order: 0; }
     .pb-footer { order: 2; }
