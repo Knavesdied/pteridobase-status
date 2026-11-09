@@ -99,17 +99,22 @@ i18n:
 
 # `icon:` on each site below is DISPLAY ONLY, and the one thing #1276 changed in
 # this block. Upptime's summary step writes `site.icon` into summary.json, and
-# the status page shows it beside each card's name. Unset, it falls back to
-# https://icons.duckduckgo.com/ip3/<host>.ico: a request to a third party from
-# every visitor, and for the EFG's site the EFG's own logo used as an icon,
-# which the brand book forbids. The cards now carry a status word instead (Up,
-# Slow, Down), so each icon is a 1x1 transparent GIF, inline so that nothing is
-# fetched at all, and hidden by the page's CSS. The check itself does not read
-# this key.
+# the status page shows it beside each card's name (the README too). Unset, it
+# falls back to https://icons.duckduckgo.com/ip3/<host>.ico, so every visitor
+# fetched each site's favicon from DuckDuckGo. These are the same favicons,
+# served by this site itself, as the page's fonts and logomark are:
+#   Pteridobase    assets/site-icon-32x32.png, byte-identical to what
+#                  DuckDuckGo served for pteridobase.org
+#   the EFG        assets/favicons/exoticferngroup-32.png, the EFG site's own
+#                  favicon.ico (a 192px PNG, fetched 9 November 2026) at 32px
+# Absolute URLs, because the README renders them on github.com. The page draws
+# them client-side from summary.json, so Sapper's crawler never follows them.
+# The owner kept the favicons (9 November 2026, #1276); the status word beside
+# each name (Up, Slow, Down) is separate. The check itself does not read this key.
 sites:
   - name: Pteridobase
     url: https://pteridobase.org/
-    icon: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+    icon: https://status.pteridobase.org/site-icon-32x32.png
     # DEGRADED above this threshold, not merely DOWN — and that distinction is
     # the whole point. The 1 September incident returned HTTP 200 throughout:
     # the site was slow, not broken, so a plain up/down check would have missed
@@ -144,7 +149,7 @@ sites:
 
   - name: Exotic Fern Group
     url: https://www.exoticferngroup.org/
-    icon: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+    icon: https://status.pteridobase.org/favicons/exoticferngroup-32.png
     # The parent charity's own site. Not ours to fix, which is exactly why the
     # threshold is looser than Pteridobase's: an alert we cannot act on is noise,
     # and the useful question here is "is it down or badly broken?", not "is it
@@ -161,7 +166,7 @@ sites:
 
   - name: Pteridobase API
     url: https://pteridobase.org/api/v1/health
-    icon: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+    icon: https://status.pteridobase.org/site-icon-32x32.png
     # Verifies CONTENT, not just the status code. The endpoint answers 503 when
     # the database is unreachable, so a status check alone would already catch
     # that - this guards the case a status check CANNOT see: a 200 carrying
@@ -756,7 +761,10 @@ status-website:
       display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
       font-size: 18px; line-height: 1.3; margin-bottom: 8px;
     }
-    #sapper section.live-status h4 img.icon { display: none; }
+    /* Each site's favicon, served by this site, 20px beside the 18px name. */
+    #sapper section.live-status h4 img.icon {
+      display: block; flex: none; width: 20px; height: 20px; margin: 0; transform: none;
+    }
     #sapper section.live-status h4 a { color: var(--efg-verdun-green); text-decoration: none; }
     #sapper section.live-status h4 a:hover { text-decoration: underline; }
     /* The facts under the title: 14px sans, figures in tabular digits. */
