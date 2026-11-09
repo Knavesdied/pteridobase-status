@@ -28,10 +28,11 @@ repo: pteridobase-status
 # charts, two different mechanisms - fixing one leaves the other stock teal,
 # which is exactly what happened.
 #
-# Verdun Green for the line; the fill is the same light tint the card sparklines
-# resolve to (#c0d59b), so both charts read as one palette.
+# Verdun Green for the line. The fill is tint-green-300 (#cfe0b4), the brand
+# token nearest the card sparklines' tint, so both charts read as one palette.
+# It was #c0d59b until #1276, a colour outside the brand's closed palette.
 graphBorderColor: "#336600"
-graphBackgroundColor: "#c0d59b"
+graphBackgroundColor: "#cfe0b4"
 
 # en-GB, so dates read 01/09/2026 rather than 9/1/2026. The platform is a UK
 # charity's, and a day/month ambiguity on an incident timeline is the kind of
@@ -379,26 +380,60 @@ status-website:
       font-display: swap; src: url('/fonts/merriweather-sans-700-normal.woff2') format('woff2');
     }
 
-    /* The EFG palette, reproduced exactly from the brand kit. Same token names
-       as theme/pteridobase/assets/css/homepage.css so the two read alike. */
+    /* Brand tokens (docs/brand/tokens.json), named as in the site's
+       homepage.css. Only colours from this list appear on the page. */
     :root {
-      --efg-verdun-green: #336600;
-      --efg-camouflage:   #33340e;
-      --pb-orange:        #d8613c;
+      --efg-verdun-green:   #336600;
+      --efg-camouflage:     #33340e;
+      --efg-confetti:       #dfe65d;
+      --efg-corduroy:       #676969;
+      --pb-orange:          #d8613c;
+      --pb-orange-text:     #b44523;
+      --pb-text-muted:      var(--efg-corduroy);
+      --pb-text-muted-dark: rgba(255, 255, 255, 0.85);
+      --pb-surface-band:    #f0f0e7;
+      --pb-line:            #e6e9e0;
+      --pb-line-green:      #c5ddb0;
+      --pb-tint-green-050:  #f2f7ea;
+      --pb-tint-green-300:  #cfe0b4;
+      --pb-status-ok:       #2f5d05;
+      --pb-status-ok-wash:  #e2efd3;
+      --pb-status-danger:   #c0392b;
+      --pb-facet-care-wash: #fdefe9;
       --pb-font-sans:  'Merriweather Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --pb-font-serif: Georgia, 'Times New Roman', Times, serif;
+      --pb-gutter: 24px;
+
+      /* Upptime's own theme variables (themes/light.css), from the tokens. */
+      --body-background-color: #ffffff;
+      --body-text-color: var(--efg-camouflage);
+      --card-background-color: #ffffff;
+      --card-border-color: var(--pb-line);
+      --nav-background-color: transparent;
+      --nav-border-bottom-color: transparent;
+      --nav-current-border-bottom-color: transparent;
+      --up-border-left-color: var(--pb-line);
+      --degraded-border-left-color: var(--pb-line);
+      --down-border-left-color: var(--pb-line);
+      --down-background-color: #ffffff;
+      --tag-color: var(--pb-status-ok);
+      --tag-up-background-color: var(--pb-status-ok-wash);
+      --tag-down-background-color: #ffffff;
+      --tag-degraded-background-color: var(--pb-facet-care-wash);
+      --change-background-color: var(--efg-confetti);
+      --error-button-border-color: var(--pb-orange);
+      --error-button-background-color: var(--efg-verdun-green);
+      --error-button-color: #ffffff;
+      --submit-button-border-color: var(--pb-orange);
+      --submit-button-background-color: var(--efg-verdun-green);
+      --submit-button-color: #ffffff;
     }
 
-    /* Upptime ships its own bare <nav> and <footer>. Ours replace them.
-       Matched with :not() rather than a child selector so this keeps working if
-       the generator changes where they sit in the tree.
-       BOTH of our navs must be excluded. The footer's link list is also a <nav>,
-       so the first version of this rule - which only spared .pb-nav-links - hid
-       the entire footer navigation. Every DOM check still passed, because the
-       six links existed and carried the right text; they were simply zero-sized.
-       Only a screenshot showed it. */
-    nav:not(.pb-nav-links):not(.pb-footer__nav),
-    footer:not(.pb-footer) { display: none !important; }
+    /* Upptime ships its own bare <nav> and <footer> as children of #sapper.
+       Ours replace them. Scoped to #sapper's children: the incident page has a
+       <footer> of its own inside <main>, holding its Back link. */
+    #sapper > nav,
+    #sapper > footer:not(.pb-footer) { display: none !important; }
 
     /* Upptime styles the bare `nav` element with a white background, which both
        of ours inherited - painting a white block over the Camouflage navbar and
@@ -415,8 +450,12 @@ status-website:
 
     body {
       font-family: var(--pb-font-serif);
+      font-size: 16px;
+      line-height: 1.6;
+      color: var(--efg-camouflage);
       background: #ffffff;
       margin: 0;
+      padding-bottom: 0;
     }
     /* Both injected blocks arrive at the top of #sapper, so ORDER - not DOM
        position - puts the footer last. flex:1 on main also pins the footer to
@@ -433,20 +472,32 @@ status-website:
        a 1440px viewport - and centred itself. It read as a styling choice rather
        than a bug, which is why it needed measuring rather than looking at.
        Addressed via #sapper > main so it beats Upptime's `.container` on
-       specificity without !important. */
+       specificity without !important.
+       The gutter lines the content up with the header's logomark: 24px on a
+       phone, 32px from 768px, and 1100px of content centred from 1024px. The
+       title sits 32px under the bar on a phone and 48px from 768px, as on
+       pteridobase.org/data-sources/. */
     #sapper > main {
       order: 1;
       flex: 1 0 auto;
       width: 100%;
-      max-width: 1100px;
+      max-width: calc(1100px + 2 * var(--pb-gutter));
       margin: 0 auto;
       box-sizing: border-box;
-      /* The title sat flush against the navbar - measured gap 0px, because the
-         navbar is sticky and <main> had no top padding. */
-      padding: 32px 20px 48px;
+      padding: 32px var(--pb-gutter) 48px;
     }
     h1, h2, h3, h4 { font-family: var(--pb-font-sans); font-weight: 700; }
+    /* web-page-title, web-section, a block's 14px heading, web-card-title. */
+    main h1 { font-size: 30px; line-height: 1.15; color: var(--efg-verdun-green); margin: 0; }
+    main h2 { font-size: 24px; line-height: 1.2; color: var(--efg-verdun-green); }
+    main h3 { font-size: 14px; line-height: 1.4; color: var(--efg-camouflage); opacity: 1; margin: 24px 0 8px; }
+    main h4 { font-size: 18px; line-height: 1.3; }
     main a { color: var(--efg-verdun-green); }
+
+    /* One focus ring for every control: pb-orange on light grounds, Confetti on
+       the dark header and the Verdun footer. */
+    :focus-visible { outline: 3px solid var(--pb-orange); outline-offset: 2px; }
+    .pb-navbar :focus-visible, .pb-footer :focus-visible { outline-color: var(--efg-confetti); }
 
     /* ---- Navbar ----------------------------------------------------------- */
     /* SOLID Camouflage, not the homepage's translucent black: that treatment
@@ -572,13 +623,15 @@ status-website:
     .pb-footer__nav a:hover, .pb-footer__nav a:focus { text-decoration: underline; }
 
     @media (min-width: 768px) {
+      :root { --pb-gutter: 32px; }
       .pb-logo-sub { display: block; }
       .pb-footer__inner { padding: 14px 32px; flex-direction: row; justify-content: space-between; align-items: center; gap: 32px; }
-      #sapper > main { padding: 40px 32px 48px; }
+      #sapper > main { padding-top: 48px; padding-bottom: 64px; }
+      main h1 { font-size: 40px; }
     }
     @media (min-width: 1024px) {
+      :root { --pb-gutter: 48px; }
       .pb-footer__inner { padding: 14px 48px; }
-      #sapper > main { padding: 40px 48px 48px; }
     }
 
   navbar:
