@@ -662,19 +662,20 @@ status-website:
       gap: 10px; align-items: flex-start;
     }
     .pb-footer__brand { display: flex; flex-direction: column; gap: 2px; }
-    .pb-footer__brand-link { font-family: var(--pb-font-sans); font-weight: 400; font-size: 13px; color: #fff; text-decoration: none; }
+    /* Every footer word at 14px, the floor for text a reader needs, as on the
+       site's footer (measured on pteridobase.org/help/). */
+    .pb-footer__brand-link { font-family: var(--pb-font-sans); font-weight: 400; font-size: 14px; line-height: 1.55; color: #fff; text-decoration: none; }
     .pb-footer__brand-link strong { font-weight: 700; }
     /* The disappearing-middot row, carried over from the site (#805). Each
        segment is a flex item; the separator is an absolutely-positioned
        ::before pinned to the segment's left edge, so it sits inside the column
        gap and is CLIPPED when a segment starts a new line.
-       0.75 alpha is a FLOOR, not a default: white on #336600 measures 4.68:1
-       there and 4.29:1 at 0.70, so anything quieter drops a statutory
-       disclosure below WCAG AA. min-width:0 is load-bearing WITH the clipping,
-       or a long segment would overflow and the disclosure would be cut off. */
+       text-muted on the Verdun theme: white at 85%, 5.5:1 on #336600, above
+       the 4.5:1 a statutory disclosure needs. min-width:0 is load-bearing WITH
+       the clipping, or a long segment would overflow and be cut off. */
     .pb-footer__legalrow {
       display: flex; flex-wrap: wrap; gap: 2px 0.85em; overflow: hidden; margin: 0;
-      font-family: var(--pb-font-sans); font-size: 11px; color: rgba(255,255,255,0.75);
+      font-family: var(--pb-font-sans); font-size: 14px; line-height: 1.55; color: var(--pb-text-muted-dark);
     }
     .pb-footer__legalrow > span { position: relative; min-width: 0; }
     .pb-footer__legalrow > span + span::before {
@@ -683,7 +684,7 @@ status-website:
     }
     .pb-footer__legalrow a { color: inherit; text-decoration: underline; }
     .pb-footer__nav { display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px 20px; }
-    .pb-footer__nav a { font-family: var(--pb-font-sans); font-size: 13px; color: #fff; text-decoration: none; }
+    .pb-footer__nav a { font-family: var(--pb-font-sans); font-size: 14px; font-weight: 300; line-height: 1.55; color: #fff; text-decoration: none; }
     .pb-footer__nav a:hover, .pb-footer__nav a:focus { text-decoration: underline; }
 
     @media (min-width: 768px) {
