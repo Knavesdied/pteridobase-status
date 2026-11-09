@@ -42,9 +42,19 @@ graphBackgroundColor: "#cfe0b4"
 i18n:
   locale: en-GB
 
+# `icon:` on each site below is DISPLAY ONLY, and the one thing #1276 changed in
+# this block. Upptime's summary step writes `site.icon` into summary.json, and
+# the status page shows it beside each card's name. Unset, it falls back to
+# https://icons.duckduckgo.com/ip3/<host>.ico: a request to a third party from
+# every visitor, and for the EFG's site the EFG's own logo used as an icon,
+# which the brand book forbids. The cards now carry a status word instead (Up,
+# Slow, Down), so each icon is a 1x1 transparent GIF, inline so that nothing is
+# fetched at all, and hidden by the page's CSS. The check itself does not read
+# this key.
 sites:
   - name: Pteridobase
     url: https://pteridobase.org/
+    icon: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
     # DEGRADED above this threshold, not merely DOWN — and that distinction is
     # the whole point. The 1 September incident returned HTTP 200 throughout:
     # the site was slow, not broken, so a plain up/down check would have missed
@@ -79,6 +89,7 @@ sites:
 
   - name: Exotic Fern Group
     url: https://www.exoticferngroup.org/
+    icon: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
     # The parent charity's own site. Not ours to fix, which is exactly why the
     # threshold is looser than Pteridobase's: an alert we cannot act on is noise,
     # and the useful question here is "is it down or badly broken?", not "is it
@@ -95,6 +106,7 @@ sites:
 
   - name: Pteridobase API
     url: https://pteridobase.org/api/v1/health
+    icon: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
     # Verifies CONTENT, not just the status code. The endpoint answers 503 when
     # the database is unreachable, so a status check alone would already catch
     # that - this guards the case a status check CANNOT see: a 200 carrying
@@ -302,6 +314,23 @@ status-website:
         Date.prototype.toLocaleTimeString = function (l, o) {
           return LTS.call(this, L, opts(TIME, o));
         };
+      })();
+    </script>
+    <script>
+      /* Upptime writes a ✅ before the all-clear line in its own template,
+         where no setting reaches it, and the brand never uses an emoji as an
+         icon. This takes it off once the line is drawn; the page's CSS draws
+         the set's tick in its place. If this never runs, the line keeps
+         Upptime's own text and nothing else changes. */
+      (function () {
+        function tidy() {
+          var line = document.querySelector('main > article.up');
+          var first = line && line.firstChild;
+          if (first && first.nodeType === 3 && /^\s*✅/.test(first.nodeValue)) {
+            first.nodeValue = first.nodeValue.replace(/^\s*✅[\s ]*/, '');
+          }
+        }
+        new MutationObserver(tidy).observe(document.documentElement, { childList: true, subtree: true });
       })();
     </script>
 
@@ -603,16 +632,134 @@ status-website:
       font-size: 14px;
     }
 
-    /* The 24h / 7d / 30d / 1y / all period controls. They are <label>s tied to
-       radio inputs and inherit the body serif, which left them the only UI
-       control on the page not in the brand sans.
+    /* ---- Cards ------------------------------------------------------------
+       Upptime's components carry scoped styles (a hashed class, regenerated
+       on every rebuild), so these rules never name that class: they start at
+       #sapper, whose id outweighs it, and key on Upptime's semantic classes
+       (up, degraded, down, link) and the period inputs' `data_` ids.
 
-       Keyed on the INPUT ID PREFIX, not on the Svelte class. Every element here
-       also carries a hashed class like `svelte-fqsq6s`, and that hash is
-       regenerated whenever the component is rebuilt - a rule written against it
-       would stop matching on some future Upptime bump, silently and with no
-       error. `data_` ids are semantic and stable. */
-    main form label[for^="data_"] { font-family: var(--pb-font-sans); }
+       A card is white with a 1px line edge and radius-lg, 16px in (24px from
+       768px). No coloured stripe down its edge: stripes belong to the
+       attention facets. Status is a badge in words, so colour never carries
+       it alone. */
+    #sapper main article {
+      background: #ffffff; border: 1px solid var(--pb-line); border-radius: 8px;
+      padding: 16px; margin: 0;
+    }
+    #sapper main article + article { margin-top: 12px; }
+    #sapper main article h4 { margin: 0; color: var(--efg-verdun-green); }
+    #sapper main article.link:hover { background: var(--pb-tint-green-050); }
+
+    #sapper main > div.f { column-gap: 16px; row-gap: 12px; margin: 0 0 16px; }
+    #sapper main > div.f > h2 { margin: 0; }
+    #sapper section.live-status { display: flex; flex-direction: column; gap: 12px; }
+    #sapper section.live-status > article + article { margin-top: 0; }
+    #sapper section.live-status h4 {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      font-size: 18px; line-height: 1.3; margin-bottom: 8px;
+    }
+    #sapper section.live-status h4 img.icon { display: none; }
+    #sapper section.live-status h4 a { color: var(--efg-verdun-green); text-decoration: none; }
+    #sapper section.live-status h4 a:hover { text-decoration: underline; }
+    /* The facts under the title: 14px sans, figures in tabular digits. */
+    #sapper section.live-status article > div {
+      font-family: var(--pb-font-sans); font-size: 14px; line-height: 1.55;
+    }
+    #sapper section.live-status .data { font-variant-numeric: tabular-nums; padding: 0 2px; }
+
+    /* The status badge (web-badge): 12px 700, 22px high, a pill with no edge,
+       in the tone that says what the word says. Down is the red-edge tone,
+       the brand's warning, so it is the one badge with an edge. */
+    #sapper section.live-status h4::after {
+      display: inline-flex; align-items: center; box-sizing: border-box;
+      height: 22px; padding: 0 10px; border-radius: 999px;
+      font-family: var(--pb-font-sans); font-size: 12px; font-weight: 700; line-height: 1;
+    }
+    #sapper section.live-status article.up h4::after {
+      content: "Up"; color: var(--pb-status-ok); background: var(--pb-status-ok-wash);
+    }
+    #sapper section.live-status article.degraded h4::after {
+      content: "Slow"; color: var(--pb-orange-text); background: var(--pb-facet-care-wash);
+    }
+    #sapper section.live-status article.down h4::after {
+      content: "Down"; color: var(--pb-status-danger); background: #ffffff;
+      border: 1px solid var(--pb-status-danger);
+    }
+
+    /* ---- Notices -----------------------------------------------------------
+       Georgia 16px, radius-lg, 12px 16px in; the ground and edge say the kind,
+       and the words say it too. Upptime colours each article's left edge with
+       !important through a custom property, so each notice resets that
+       property rather than fighting the !important. */
+    #sapper main > article.up,
+    #sapper main article.down-active,
+    #sapper main article.degraded-active { padding: 12px 16px; }
+    #sapper main > article.up {
+      display: flex; align-items: center; gap: 8px; margin: 0 0 32px;
+      background: var(--pb-status-ok-wash); border-color: var(--pb-tint-green-300);
+      --up-border-left-color: var(--pb-tint-green-300);
+    }
+    #sapper main article.down-active {
+      border: 2px solid var(--pb-status-danger);
+      --down-border-left-color: var(--pb-status-danger);
+    }
+    #sapper main article.down-active.degraded {
+      border: 1px solid var(--pb-orange); background: var(--pb-facet-care-wash);
+      --degraded-border-left-color: var(--pb-orange);
+    }
+    #sapper main article.degraded-active {
+      background: var(--pb-tint-green-050); border-color: var(--pb-line-green);
+      --degraded-border-left-color: var(--pb-line-green);
+    }
+    #sapper main article.down-active h4,
+    #sapper main article.degraded-active h4 {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 14px; line-height: 1.4; color: var(--efg-camouflage);
+    }
+    #sapper main article.down-active:not(.degraded) h4 { color: var(--pb-status-danger); }
+    /* A past incident's or maintenance's facts, like a status card's: 14px sans. */
+    #sapper main section > article:not(.down-active):not(.degraded-active) h4 + div {
+      font-family: var(--pb-font-sans); font-size: 14px; line-height: 1.55;
+    }
+    /* The set's icons, drawn through a mask so they take the words' colour.
+       The files are byte-for-byte copies of docs/brand/icons/, in assets/icons/. */
+    #sapper main > article.up::before,
+    #sapper main article.down-active h4::before {
+      content: ''; flex: none; width: 20px; height: 20px; background: currentColor;
+      -webkit-mask: var(--pb-icon) center / contain no-repeat;
+              mask: var(--pb-icon) center / contain no-repeat;
+    }
+    #sapper main > article.up::before { --pb-icon: url('/icons/pb-icon-accept.svg'); color: var(--pb-status-ok); }
+    #sapper main article.down-active h4::before { --pb-icon: url('/icons/pb-icon-warning.svg'); }
+    #sapper main article.down-active.degraded h4::before { color: var(--pb-orange); }
+
+    /* ---- Period choices ----------------------------------------------------
+       The brand's segmented strip: one 32px box with a Corduroy edge and
+       radius-md, its parts 14px 700 in Verdun, the chosen part Verdun with
+       white words. Two to four choices, so "all" is not offered: until
+       monitoring is a year old (September 2027) it shows the same figures as
+       "1 year". Upptime hides the radios with display:none, which takes them
+       off the keyboard; here they are hidden visually only, and the focus
+       ring is drawn on the label. */
+    #sapper main form.r {
+      display: inline-flex; align-items: stretch; flex-wrap: nowrap; height: 32px; box-sizing: border-box;
+      border: 1px solid var(--efg-corduroy); border-radius: 6px;
+    }
+    #sapper main form.r > div { display: flex; position: relative; }
+    #sapper main form.r > div:has(> #data_all) { display: none; }
+    #sapper main form.r input[id^="data_"] {
+      display: block; position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none;
+    }
+    #sapper main form.r label[for^="data_"] {
+      display: flex; align-items: center; margin: 0; padding: 0 12px;
+      font-family: var(--pb-font-sans); font-size: 14px; font-weight: 700; line-height: 1;
+      color: var(--efg-verdun-green); white-space: nowrap; cursor: pointer;
+    }
+    #sapper main form.r > div + div > label { border-left: 1px solid var(--efg-corduroy); }
+    #sapper main form.r > div:first-child > label { border-radius: 5px 0 0 5px; }
+    #sapper main form.r > div:nth-last-child(2) > label { border-radius: 0 5px 5px 0; }
+    #sapper main form.r input:checked + label { background: var(--efg-verdun-green); color: #ffffff; }
+    #sapper main form.r input:focus-visible + label { outline: 3px solid var(--pb-orange); outline-offset: 2px; position: relative; z-index: 1; }
 
     /* ---- Response-time chart ----------------------------------------------
        The sparkline behind each card is a generated PNG, not a client-side
@@ -630,14 +777,16 @@ status-website:
        and the card's content is lifted above it. pointer-events stays off so
        the card remains clickable.
 
-       -78deg takes the stock teal (#89e0cf, hue ~165) to Verdun Green's hue,
-       and the desaturation keeps it a light TINT - it sits behind the uptime
-       figures, so it has to stay readable rather than match #336600 exactly. */
+       -78deg takes the stock teal fill (#88e0d0) to Verdun Green's hue, and the
+       desaturation and brightness land it on tint-green-300: measured through
+       the same filter on a canvas, rgb(209,226,180) against the token's
+       rgb(207,224,180). It sits behind the figures, so it stays a light tint. */
     article.graph { position: relative; background-image: none !important; }
     article.graph::before {
       content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      border-radius: inherit;
       background: var(--background) no-repeat 100% 50% / contain;
-      filter: hue-rotate(-78deg) saturate(0.75);
+      filter: hue-rotate(-78deg) saturate(0.55) brightness(1.08);
     }
     article.graph > * { position: relative; z-index: 1; }
 
@@ -695,6 +844,7 @@ status-website:
       .pb-footer__inner { padding: 14px 32px; flex-direction: row; justify-content: space-between; align-items: center; gap: 32px; }
       #sapper > main { padding-top: 48px; padding-bottom: 64px; }
       main h1 { font-size: 40px; }
+      #sapper main article { padding: 24px; }
     }
     @media (min-width: 1024px) {
       :root { --pb-gutter: 48px; }
