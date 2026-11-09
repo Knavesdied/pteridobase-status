@@ -39,8 +39,60 @@ graphBackgroundColor: "#cfe0b4"
 # thing that gets misread precisely when it matters. Set explicitly because
 # Upptime supplies its own default when this is absent - which is why the UTC
 # override's own `en-GB` fallback never applied: the locale was never undefined.
+#
+# THE PAGE'S WORDS, in the brand's voice (docs/brand/01-voice.md; #1276):
+# sentence case, plain words, facts in a row joined by a spaced mid-dot,
+# typographic apostrophes. Every key below is read by the status page alone
+# (@upptime/status-page's i18n.yml lists the defaults). The monitor reads none
+# of them: it writes its incident titles ("... is down", "... has degraded
+# performance") in its own code, and the site banner's hook reads those, so
+# they are not set here and must not be.
+#
+# The summaries leave out Upptime's comment count ($POSTS): the template cannot
+# pluralise, and "1 updates" is worse than no count. The incident page lists
+# the updates themselves.
 i18n:
   locale: en-GB
+  allSystemsOperational: Everything is working normally.
+  liveStatus: Live status
+  duration24H: 24 hours
+  duration7D: 7 days
+  duration30D: 30 days
+  duration1Y: 1 year
+  durationAll: All time
+  overallUptime: "Uptime: $UPTIME"
+  overallUptimeTitle: Uptime
+  averageResponseTime: "Average response time: $TIME ms"
+  averageResponseTimeTitle: Average response time
+  up: Up
+  down: Down
+  degraded: Slow
+  activeIncidents: Active incidents
+  activeIncidentSummary: Since $DATE
+  pastIncidents: Past incidents
+  pastIncidentsResolved: Resolved in $MINUTES minutes
+  incidentReport: Incident report
+  incidentTitle: Incident $NUMBER — Pteridobase
+  incidentDetails: Incident details
+  incidentFixed: Resolved
+  incidentOngoing: Ongoing
+  incidentOpenedAt: Started
+  incidentClosedAt: Resolved
+  incidentViewOnGitHub: Follow this incident on GitHub
+  incidentCommentSummary: Posted $DATE by $AUTHOR
+  incidentBack: Back to status
+  sevelDayResponseTime: Recent response times
+  scheduledMaintenance: Planned maintenance
+  pastScheduledMaintenance: Past maintenance
+  scheduledMaintenanceSummaryStarted: Started $DATE · $DURATION minutes
+  scheduledMaintenanceSummaryStarts: Starts $DATE · $DURATION minutes
+  startedAt: Started
+  startsAt: Starts
+  incidentScheduled: Planned
+  errorTitle: The latest status didn’t load
+  errorIntro: "This usually clears in a moment: the page may have been updating as you opened it."
+  errorText: If it keeps happening, GitHub, which hosts this page’s data, may be having trouble.
+  errorHome: Try again
 
 # `icon:` on each site below is DISPLAY ONLY, and the one thing #1276 changed in
 # this block. Upptime's summary step writes `site.icon` into summary.json, and
@@ -143,7 +195,8 @@ sites:
 
 status-website:
   cname: status.pteridobase.org
-  name: Pteridobase Status
+  # The tab's title, in the site's own pattern ("Data Sources — Pteridobase").
+  name: Status — Pteridobase
   theme: light
 
   # The page's own introduction. Restored after being dropped when this block was
@@ -153,7 +206,9 @@ status-website:
   # TITLE ONLY, no introMessage. The descriptive paragraph was removed at the
   # owner's request: the page's job is to show whether things are up, and a
   # visitor who has navigated to a status page does not need it explained.
-  introTitle: "**Pteridobase** platform status"
+  # Plain words in sentence case (#1276): the bold "Pteridobase" added nothing
+  # inside a heading that is already bold.
+  introTitle: Pteridobase status
 
 
   # BRANDING. Upptime's status page is a static Svelte site we control through
