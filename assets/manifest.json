@@ -1,7 +1,7 @@
 {
-  "name": "Pteridobase Status",
+  "name": "Pteridobase status",
   "short_name": "Pteridobase",
-  "description": "Live availability and response times for Pteridobase, the Exotic Fern Group's conservation and collection records platform.",
+  "description": "Live availability and response times for Pteridobase, the Exotic Fern Group’s conservation and collection records platform.",
   "background_color": "#ffffff",
   "theme_color": "#33340e",
   "display": "minimal-ui",
