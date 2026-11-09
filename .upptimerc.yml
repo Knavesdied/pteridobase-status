@@ -96,6 +96,14 @@ i18n:
   errorIntro: "This usually clears in a moment: the page may have been updating as you opened it."
   errorText: If it keeps happening, GitHub, which hosts this page’s data, may be having trouble.
   errorHome: Try again
+  # The rate-limit page, in the owner's words (9 November 2026). Its personal
+  # access token section is hidden by the page's CSS, so its keys keep
+  # Upptime's defaults.
+  rateLimitExceededIntro: The limit on the number of visits to the Pteridobase status has been reached.
+  rateLimitExceededWhatDoesErrorMean: Why this happened
+  rateLimitExceededErrorMeaning: There is a limit of 60 requests per hour from each Internet address, and that allowance has been used, perhaps by others on the same network.
+  rateLimitExceededErrorHowCanFix: What you can do
+  rateLimitExceededErrorFix: Wait for the limit to reset, then reload. It’s an hourly limit, so it shouldn’t take long to reset.
 
 # `icon:` on each site below is DISPLAY ONLY, and the one thing #1276 changed in
 # this block. Upptime's summary step writes `site.icon` into summary.json, and
@@ -945,30 +953,26 @@ status-website:
     #sapper .loading svg { stroke: var(--efg-corduroy); }
 
     /* ---- Error and rate-limit pages -----------------------------------------
-       Prose: a web-lead line, then Georgia. The button is the brand's primary:
-       Verdun, white words, a 3px pb-orange edge, a 44px pill. The token field
-       is the brand's field: white, 1px Corduroy edge, 32px, Georgia 16px. */
+       Prose: a web-lead line, then Georgia. The error page's button is the
+       brand's primary: Verdun, white words, a 3px pb-orange edge, a 44px pill. */
     #sapper main p.lead { font-family: var(--pb-font-sans); font-size: 20px; line-height: 1.45; font-weight: 300; }
-    #sapper main a.error-button,
-    #sapper main button {
+    #sapper main a.error-button {
       display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box;
       min-height: 44px; padding: 0 20px; border: 3px solid var(--pb-orange); border-radius: 24px;
       background: var(--efg-verdun-green); color: #ffffff;
       font-family: var(--pb-font-sans); font-size: 14px; font-weight: 700; line-height: 1.2;
       text-decoration: none; cursor: pointer;
     }
-    #sapper main form:not(.r) label span {
-      display: block; margin: 0 0 4px;
-      font-family: var(--pb-font-sans); font-size: 14px; font-weight: 700; color: var(--efg-camouflage);
-    }
-    #sapper main form:not(.r) input[type="text"] {
-      box-sizing: border-box; height: 32px; padding: 0 10px; margin: 0 8px 8px 0;
-      border: 1px solid var(--efg-corduroy); border-radius: 6px; background: #ffffff;
-      font-family: var(--pb-font-serif); font-size: 16px; color: var(--efg-camouflage);
-    }
-    #sapper main form:not(.r) input[type="text"]::placeholder {
-      font-family: var(--pb-font-serif); font-style: italic; font-size: 14px; color: var(--efg-corduroy); opacity: 1;
-    }
+    /* The rate-limit page's personal access token section is not offered
+       (owner, 9 November 2026): the advice is to wait for the hourly limit to
+       reset. Hidden in both of its states, so nothing of it is seen, focused
+       or read aloud: the GitHub Docs link at the end of "What you can do",
+       the form (field and Save), and, for a browser that saved a token
+       before, the line saying so and its Remove button. */
+    #sapper main a[href*="personal-access-token"],
+    #sapper > main > form,
+    #sapper > main > p:has(+ button),
+    #sapper > main > button { display: none !important; }
 
     /* ---- Response-time chart ----------------------------------------------
        The sparkline behind each card is a generated PNG, not a client-side
