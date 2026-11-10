@@ -4,11 +4,11 @@
     "url": "https://pteridobase.org/",
     "icon": "https://status.pteridobase.org/site-icon-32x32.png",
     "slug": "pteridobase",
-    "status": "up",
+    "status": "down",
     "uptime": "100.00%",
-    "uptimeDay": "99.67%",
-    "uptimeWeek": "99.95%",
-    "uptimeMonth": "99.99%",
+    "uptimeDay": "99.98%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 1185,
     "timeDay": 903,
@@ -16,7 +16,7 @@
     "timeMonth": 1401,
     "timeYear": 1185,
     "dailyMinutesDown": {
-      "2026-11-10": 5
+      "2026-11-10": 0
     }
   },
   {
@@ -42,11 +42,11 @@
     "url": "https://pteridobase.org/api/v1/health",
     "icon": "https://status.pteridobase.org/site-icon-32x32.png",
     "slug": "pteridobase-api",
-    "status": "up",
+    "status": "degraded",
     "uptime": "100.00%",
-    "uptimeDay": "99.68%",
-    "uptimeWeek": "99.95%",
-    "uptimeMonth": "99.99%",
+    "uptimeDay": "99.98%",
+    "uptimeWeek": "100.00%",
+    "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
     "time": 701,
     "timeDay": 542,
@@ -54,7 +54,7 @@
     "timeMonth": 878,
     "timeYear": 701,
     "dailyMinutesDown": {
-      "2026-11-10": 5
+      "2026-11-10": 0
     }
   }
 ]
