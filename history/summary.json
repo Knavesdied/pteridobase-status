@@ -4,9 +4,9 @@
     "url": "https://pteridobase.org/",
     "icon": "https://status.pteridobase.org/site-icon-32x32.png",
     "slug": "pteridobase",
-    "status": "up",
+    "status": "down",
     "uptime": "100.00%",
-    "uptimeDay": "100.00%",
+    "uptimeDay": "99.98%",
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
@@ -15,7 +15,9 @@
     "timeWeek": 2003,
     "timeMonth": 1401,
     "timeYear": 1185,
-    "dailyMinutesDown": {}
+    "dailyMinutesDown": {
+      "2026-11-10": 0
+    }
   },
   {
     "name": "Exotic Fern Group",
@@ -40,9 +42,9 @@
     "url": "https://pteridobase.org/api/v1/health",
     "icon": "https://status.pteridobase.org/site-icon-32x32.png",
     "slug": "pteridobase-api",
-    "status": "up",
+    "status": "degraded",
     "uptime": "100.00%",
-    "uptimeDay": "100.00%",
+    "uptimeDay": "99.98%",
     "uptimeWeek": "100.00%",
     "uptimeMonth": "100.00%",
     "uptimeYear": "100.00%",
@@ -51,6 +53,8 @@
     "timeWeek": 1235,
     "timeMonth": 878,
     "timeYear": 700,
-    "dailyMinutesDown": {}
+    "dailyMinutesDown": {
+      "2026-11-10": 0
+    }
   }
 ]
